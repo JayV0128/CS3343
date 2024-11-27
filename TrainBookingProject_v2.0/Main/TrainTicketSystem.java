@@ -440,55 +440,86 @@ public class TrainTicketSystem {
 	}
 
 	private void summarizeOrders(ArrayList<OrderRecord> userOrders) {
-		int ratingSum = 0;
-		HashMap<String, Integer> destVisitCount = new HashMap<>();
-		HashMap<String, Double> destAvgRating = new HashMap<>();
-		int maxVisitCount = 0;
-		double maxAvgRating = 0;
+	    double avgRating = calculateAverageRating(userOrders);
+	    HashMap<String, Integer> destVisitCount = calculateDestinationVisitCount(userOrders);
+	    Map<String, Double> destAvgRating = calculateDestinationAvgRating(userOrders);
 
-		for (OrderRecord order : userOrders) {
-			ratingSum += order.getRating();
+	    // Find most visited destinations
+	    int maxVisitCount = Collections.max(destVisitCount.values());
+	    // Find highest rated destinations
+	    double maxAvgRating = Collections.max(destAvgRating.values());
 
-			String dest = trainDAO.getTrain_fromTrainTable(order.getTrainId()).getArrival();
-			int visitCount = destVisitCount.getOrDefault(dest, 0);
-			double destRatingSum = destAvgRating.getOrDefault(dest, 0.0) * visitCount;
-
-			int newVisitCount = visitCount + 1;
-			double newRatingAvg = (destRatingSum + order.getRating()) / newVisitCount;
-
-			destVisitCount.put(dest, newVisitCount);
-			destAvgRating.put(dest, newRatingAvg);
-
-			if (maxVisitCount < newVisitCount) {
-				maxVisitCount = newVisitCount;
-			}
-
-		}
-
-		for (double avgRating : destAvgRating.values()) {
-			if (maxAvgRating < avgRating) {
-				maxAvgRating = avgRating;
-			}
-		}
-
-		System.out.println("Summary of your orders:");
-		System.out.printf("Average rating of your orders: %.2f\n", ratingSum / (double) userOrders.size());
-
-		System.out.printf("Your most visited destination(s) (%d times each):\n", maxVisitCount);
-		for (Map.Entry<String, Integer> entry : destVisitCount.entrySet()) {
-			if (entry.getValue() == maxVisitCount) {
-				System.out.println(entry.getKey());
-			}
-		}
-
-		System.out.printf("Your highest rated destination(s) (Average of %.2f rating each):\n", maxAvgRating);
-		for (Map.Entry<String, Double> entry : destAvgRating.entrySet()) {
-			if (entry.getValue() == maxAvgRating) {
-				System.out.println(entry.getKey());
-			}
-		}
+	    // Output summary
+	    System.out.printf("Summary of your orders:\n");
+	    System.out.printf("Average rating of your orders: %.2f\n", avgRating);
+	    System.out.printf("Your most visited destination(s) (%d times each): %s\n", maxVisitCount, String.join(", ", getMostVisitedDestination(userOrders)));
+	    System.out.printf("Your highest rated destination(s) (Average of %.2f rating each): %s\n\n", maxAvgRating, String.join(", ",  getMaxAvgRatingDestination(userOrders)));
+	}
+	
+	public double calculateAverageRating(ArrayList<OrderRecord> userOrders) {
+	    int ratingSum = 0;
+	    for (OrderRecord order : userOrders) {
+	        ratingSum += order.getRating();
+	    }
+	    return ratingSum / (double) userOrders.size();
 	}
 
+	public ArrayList<String> getMostVisitedDestination(ArrayList<OrderRecord> userOrders) {
+		ArrayList<String> mostVisitedDest = new ArrayList<>();
+		HashMap<String, Integer> destVisitCount = calculateDestinationVisitCount(userOrders);
+		int maxVisitCount = Collections.max(destVisitCount.values());
+		
+	    for (Map.Entry<String, Integer> entry : destVisitCount.entrySet()) {
+	        if (entry.getValue() == maxVisitCount) {
+	            mostVisitedDest.add(entry.getKey());
+	        }
+	    }
+	    
+	    return mostVisitedDest;
+	}
+	
+	private HashMap<String, Integer> calculateDestinationVisitCount(ArrayList<OrderRecord> userOrders) {
+	    HashMap<String, Integer> destVisitCount = new HashMap<>();
+	    for (OrderRecord order : userOrders) {
+	        String dest = trainDAO.getTrain_fromTrainTable(order.getTrainId()).getArrival();
+	        destVisitCount.put(dest, destVisitCount.getOrDefault(dest, 0) + 1);
+	    }
+	    return destVisitCount;
+	}
+	
+	public ArrayList<String> getMaxAvgRatingDestination(ArrayList<OrderRecord> userOrders) {
+		ArrayList<String> maxAvgRatingDest = new ArrayList<>();
+		HashMap<String, Double> destAvgRating = calculateDestinationAvgRating(userOrders);
+	    double maxAvgRating = Collections.max(destAvgRating.values());
+		
+	    for (Map.Entry<String, Double> entry : destAvgRating.entrySet()) {
+	        if (entry.getValue() == maxAvgRating) {
+	        	maxAvgRatingDest.add(entry.getKey());
+	        }
+	    }
+	    
+	    return maxAvgRatingDest;
+	}
+	
+	private HashMap<String, Double> calculateDestinationAvgRating(ArrayList<OrderRecord> userOrders) {
+		HashMap<String, Double> destTotalRating = new HashMap<>();
+		HashMap<String, Double> destAvgRating = new HashMap<>();
+		HashMap<String, Integer> destVisitCount = calculateDestinationVisitCount(userOrders);
+	    
+	    for (OrderRecord order : userOrders) {
+	        String dest = trainDAO.getTrain_fromTrainTable(order.getTrainId()).getArrival();
+	        destTotalRating.put(dest, destTotalRating.getOrDefault(dest, 0.0) + order.getRating());
+	    }
+	    
+	    for (Map.Entry<String, Double> entry : destTotalRating.entrySet()) {
+	    	String dest = entry.getKey();
+	    	double avgRating = entry.getValue() / destVisitCount.get(dest);
+	    	destAvgRating.put(dest, avgRating);
+	    }
+	    
+	    return destAvgRating;
+	}
+	
 	private void editTicket(Scanner scanner, OrderRecord order) {
 		System.out.println("Current Order Details:");
 		System.out.println(order.toString());
