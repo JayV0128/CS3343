@@ -1,4 +1,5 @@
 package Main;
+
 import java.util.*;
 import DataModel.*;
 
@@ -76,7 +77,7 @@ public class Main {
                         // Subscribe and receive messages
                         train_ticket_system.subscribeUser(current_LoginedUser.getId());
                         break;
-                    
+
                     case 5:
                         // Check in
                         train_ticket_system.checkIn();

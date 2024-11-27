@@ -15,7 +15,6 @@ public class User implements MessageObserver {
     private ArrayList<OrderRecord> orderRecordList;
     private ArrayList<Coupon> couponList;
 
-
     private String latestAnnouncement;
 
     public User(String role, String id, String username, String password) {
@@ -126,10 +125,5 @@ public class User implements MessageObserver {
     public boolean isReceivedAnnouncement() {
         return latestAnnouncement != null;
     }
-
-
-
-   
-
 
 }
