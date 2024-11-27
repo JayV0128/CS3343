@@ -938,61 +938,62 @@ public class TrainTicketSystem {
 		System.out.println(
 				"\n=============================================================================================================");
 		while (isStay) {
-			boolean isKeyword = false;
-			boolean isAnswer = false;
-			String answer = null;
+			String answer = "";
 			String keywordInput = null;
 			ArrayList<String> keywords = new ArrayList<>();
-
-			while (!isKeyword) {
-				System.out.println("Enter keywords (separated by commas):");
-				keywordInput = scanner.nextLine();
-				if (keywordInput.isEmpty()) {
-					System.out.println("Keywords cannot be empty.");
-				} else if (keywordInput.equals("exit")) {
-					isStay = false;
-					System.out.println(
-							"\n=============================================================================================================");
-					return;
-				} else {
-					String[] keywordArray = keywordInput.split(",");
-					for (String keyword : keywordArray) {
-						keywords.add(keyword.trim());
-					}
-					isKeyword = true;
-				}
+			
+			System.out.println("Enter keywords (separated by commas):");
+			keywordInput = scanner.nextLine();
+			if (keywordInput.equals("exit")) {
+				isStay = false;
 			}
-
-			while (!isAnswer) {
+			if(isStay != false) {
 				System.out.println("Enter answer:");
 				answer = scanner.nextLine();
-				if (answer.isEmpty()) {
-					System.out.println("Answer cannot be empty.");
-				} else if (answer.equals("exit")) {
-					isStay = false;
-					System.out.println(
-							"\n=============================================================================================================");
-					return;
-				} else {
-					isAnswer = true;
-				}
 			}
-
-			System.out.println(addQA(keywords, answer));
+			if (answer.equals("exit")) {
+				isStay = false;
+			}
+			if(isStay != false) {
+				System.out.println(addQA(keywordInput, answer));
+			}
 		}
 		System.out.println(
 				"\n=============================================================================================================");
 	}
 
 	// fn to find answer by keyword
-	public String addQA(ArrayList<String> keyword, String answer) {
-		String returnWord = "";
-		if (customerServiceDAO.addQA(new CsQuestion(keyword, answer))) {
-			returnWord = "QA added successfully.";
-		} else {
-			returnWord = "Failed to add QA.";
-		}
-		return returnWord;
+	public String addQA(String keywords, String answer) {
+	    ArrayList<CsQuestion> questionList = customerServiceDAO.getTable_question();
+	    Set<String> keywordSet = new HashSet<>();
+	    
+	    if (keywords == null || keywords.trim().isEmpty()) {
+	        return "Keywords cannot be empty.";
+	    }
+	    if (answer == null || answer.trim().isEmpty()) {
+	        return "Answer cannot be empty.";
+	    }
+	    String[] keywordArray = keywords.split(",");
+	    for (String keyword : keywordArray) {
+	        keyword = keyword.trim();
+	        if (keyword.isEmpty()) {
+	            return "Keywords list fields cannot be empty.";
+	        }
+	        keywordSet.add(keyword);
+	    }
+	    
+	    for (CsQuestion question : questionList) {
+	        for (String existingKeyword : question.getQuestion()) {
+	            if (keywordSet.contains(existingKeyword)) {
+	                return "Keywords already exist.";
+	            }
+	        }
+	    }
+	    if (customerServiceDAO.addQA(new CsQuestion(new ArrayList<>(keywordSet), answer))) {
+	        return "QA added successfully.";
+	    }else {
+	    	return null;
+	    }
 	}
 
 	// Report methods for admin
