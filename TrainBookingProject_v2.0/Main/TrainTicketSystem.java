@@ -1006,7 +1006,7 @@ public class TrainTicketSystem {
 	    }
 	    String[] keywordArray = keywords.split(",");
 	    for (String keyword : keywordArray) {
-	        keyword = keyword.trim();
+	        keyword = keyword.trim().toLowerCase();
 	        if (keyword.isEmpty()) {
 	            return "Keywords list fields cannot be empty.";
 	        }
