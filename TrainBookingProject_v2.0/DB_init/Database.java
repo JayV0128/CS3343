@@ -21,6 +21,8 @@ public class Database {
     private ArrayList<User> backup_table_user;
     private ArrayList<Train> backup_table_train;
     private ArrayList<OrderRecord> backup_table_orderRecord;
+    private ArrayList<seatPlan> backup_table_seattingPlan;
+    private ArrayList<CsQuestion> backup_table_question;
 
     // ID values reference for each table
 
@@ -116,6 +118,8 @@ public class Database {
         backup_table_user = new ArrayList<>(table_user);
         backup_table_train = new ArrayList<>(table_train);
         backup_table_orderRecord = new ArrayList<>(table_orderRecord);
+        backup_table_seattingPlan = new ArrayList<>(table_seattingPlan);
+        backup_table_question = new ArrayList<>(table_question);
     }
 
     public ArrayList<User> getTable_user() {
@@ -157,5 +161,7 @@ public class Database {
         table_user = new ArrayList<>(backup_table_user);
         table_train = new ArrayList<>(backup_table_train);
         table_orderRecord = new ArrayList<>(backup_table_orderRecord);
+        table_seattingPlan = new ArrayList<>(backup_table_seattingPlan);
+        table_question = new ArrayList<>(backup_table_question);
     }
 }
