@@ -765,7 +765,6 @@ public class TrainTicketSystem {
 				returnVal.add("true");
 				returnVal.add("Overlap time slot detected, new time slot: " + time);
 			}
-			return returnVal;
 		}
 		int totalSeats = 24;
 		Train newTrain = new Train(trainID, departure, arrival, date, time, totalSeats, price);
@@ -1405,107 +1404,110 @@ public class TrainTicketSystem {
 	public void displayUserList() {
 		userDAO.printUserList();
 	}
+
 	public List<User> generateUserReport(List<User> users, String roleFilter, String usernameSearch) {
-	    List<User> filteredUsers = new ArrayList<>(users);
-	    
-	    if (roleFilter != null && !roleFilter.isEmpty()) {
-	        filteredUsers = filteredUsers.stream()
-	            .filter(user -> user.getRole().equalsIgnoreCase(roleFilter))
-	            .collect(Collectors.toList());
-	    }
-	    
-	    if (usernameSearch != null && !usernameSearch.isEmpty()) {
-	        filteredUsers = filteredUsers.stream()
-	            .filter(user -> user.getUsername().toLowerCase().contains(usernameSearch.toLowerCase()))
-	            .collect(Collectors.toList());
-	    }
-	    
-	    return filteredUsers;
+		List<User> filteredUsers = new ArrayList<>(users);
+
+		if (roleFilter != null && !roleFilter.isEmpty()) {
+			filteredUsers = filteredUsers.stream()
+					.filter(user -> user.getRole().equalsIgnoreCase(roleFilter))
+					.collect(Collectors.toList());
+		}
+
+		if (usernameSearch != null && !usernameSearch.isEmpty()) {
+			filteredUsers = filteredUsers.stream()
+					.filter(user -> user.getUsername().toLowerCase().contains(usernameSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		return filteredUsers;
 	}
+
 	public List<Train> generateTrainReport(List<Train> trains, String trainIdSearch, String stationSearch,
-            String startDateStr, String endDateStr, String statusFilter) {
-	List<Train> filteredTrains = new ArrayList<>(trains);
+			String startDateStr, String endDateStr, String statusFilter) {
+		List<Train> filteredTrains = new ArrayList<>(trains);
 
-	if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
-	filteredTrains = filteredTrains.stream()
-	.filter(train -> train.getTrainNumber().toLowerCase().contains(trainIdSearch.toLowerCase()))
-	.collect(Collectors.toList());
+		if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
+			filteredTrains = filteredTrains.stream()
+					.filter(train -> train.getTrainNumber().toLowerCase().contains(trainIdSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		if (stationSearch != null && !stationSearch.isEmpty()) {
+			filteredTrains = filteredTrains.stream()
+					.filter(train -> train.getDeparture().toLowerCase().contains(stationSearch.toLowerCase()) ||
+							train.getArrival().toLowerCase().contains(stationSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		if (startDateStr != null && endDateStr != null) {
+			try {
+				LocalDate startDate = LocalDate.parse(startDateStr);
+				LocalDate endDate = LocalDate.parse(endDateStr);
+
+				filteredTrains = filteredTrains.stream()
+						.filter(train -> {
+							LocalDate trainDate = LocalDate.parse(train.getDate());
+							return (trainDate.isEqual(startDate) || trainDate.isAfter(startDate)) &&
+									(trainDate.isEqual(endDate) || trainDate.isBefore(endDate));
+						})
+						.collect(Collectors.toList());
+			} catch (DateTimeParseException e) {
+				// Handle parsing error
+			}
+		}
+
+		if (statusFilter != null && !statusFilter.isEmpty()) {
+			filteredTrains = filteredTrains.stream()
+					.filter(train -> train.getStatus().equalsIgnoreCase(statusFilter))
+					.collect(Collectors.toList());
+		}
+
+		return filteredTrains;
 	}
-	
-	if (stationSearch != null && !stationSearch.isEmpty()) {
-	filteredTrains = filteredTrains.stream()
-	.filter(train -> train.getDeparture().toLowerCase().contains(stationSearch.toLowerCase()) ||
-	  train.getArrival().toLowerCase().contains(stationSearch.toLowerCase()))
-	.collect(Collectors.toList());
-	}
-	
-	if (startDateStr != null && endDateStr != null) {
-	try {
-	LocalDate startDate = LocalDate.parse(startDateStr);
-	LocalDate endDate = LocalDate.parse(endDateStr);
-	
-	filteredTrains = filteredTrains.stream()
-	.filter(train -> {
-	LocalDate trainDate = LocalDate.parse(train.getDate());
-	return (trainDate.isEqual(startDate) || trainDate.isAfter(startDate)) &&
-	(trainDate.isEqual(endDate) || trainDate.isBefore(endDate));
-	})
-	.collect(Collectors.toList());
-	} catch (DateTimeParseException e) {
-	// Handle parsing error
-	}
-	}
-	
-	if (statusFilter != null && !statusFilter.isEmpty()) {
-	filteredTrains = filteredTrains.stream()
-	.filter(train -> train.getStatus().equalsIgnoreCase(statusFilter))
-	.collect(Collectors.toList());
-	}
-	
-	return filteredTrains;
-	}
+
 	public List<OrderRecord> generateOrderReport(List<OrderRecord> orders, String userIdSearch, String trainIdSearch,
-            String startDateStr, String endDateStr, String orderIdSearch) {
-	List<OrderRecord> filteredOrders = new ArrayList<>(orders);
-	
-	if (orderIdSearch != null && !orderIdSearch.isEmpty()) {
-	filteredOrders = filteredOrders.stream()
-	.filter(order -> order.getOrderId().toLowerCase().contains(orderIdSearch.toLowerCase()))
-	.collect(Collectors.toList());
-	}
-	
-	if (userIdSearch != null && !userIdSearch.isEmpty()) {
-	filteredOrders = filteredOrders.stream()
-	.filter(order -> order.getUserId().toLowerCase().contains(userIdSearch.toLowerCase()))
-	.collect(Collectors.toList());
-	}
-	
-	if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
-	filteredOrders = filteredOrders.stream()
-	.filter(order -> order.getTrainId().toLowerCase().contains(trainIdSearch.toLowerCase()))
-	.collect(Collectors.toList());
-	}
+			String startDateStr, String endDateStr, String orderIdSearch) {
+		List<OrderRecord> filteredOrders = new ArrayList<>(orders);
 
-	if (startDateStr != null && endDateStr != null) {
-	try {
-	LocalDate startDate = LocalDate.parse(startDateStr);
-	LocalDate endDate = LocalDate.parse(endDateStr);
-	
-	filteredOrders = filteredOrders.stream()
-	.filter(order -> {
-	LocalDate orderDate = order.getOrderDate().toInstant()
-	.atZone(ZoneId.systemDefault())
-	.toLocalDate();
-	return (orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
-	(orderDate.isEqual(endDate) || orderDate.isBefore(endDate));
-	})
-	.collect(Collectors.toList());
-	} catch (DateTimeParseException e) {
-	// Handle parsing error
-	}
-	}
-	
-	return filteredOrders;
+		if (orderIdSearch != null && !orderIdSearch.isEmpty()) {
+			filteredOrders = filteredOrders.stream()
+					.filter(order -> order.getOrderId().toLowerCase().contains(orderIdSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		if (userIdSearch != null && !userIdSearch.isEmpty()) {
+			filteredOrders = filteredOrders.stream()
+					.filter(order -> order.getUserId().toLowerCase().contains(userIdSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
+			filteredOrders = filteredOrders.stream()
+					.filter(order -> order.getTrainId().toLowerCase().contains(trainIdSearch.toLowerCase()))
+					.collect(Collectors.toList());
+		}
+
+		if (startDateStr != null && endDateStr != null) {
+			try {
+				LocalDate startDate = LocalDate.parse(startDateStr);
+				LocalDate endDate = LocalDate.parse(endDateStr);
+
+				filteredOrders = filteredOrders.stream()
+						.filter(order -> {
+							LocalDate orderDate = order.getOrderDate().toInstant()
+									.atZone(ZoneId.systemDefault())
+									.toLocalDate();
+							return (orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
+									(orderDate.isEqual(endDate) || orderDate.isBefore(endDate));
+						})
+						.collect(Collectors.toList());
+			} catch (DateTimeParseException e) {
+				// Handle parsing error
+			}
+		}
+
+		return filteredOrders;
 	}
 
 }
