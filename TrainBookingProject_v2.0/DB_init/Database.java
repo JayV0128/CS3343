@@ -45,6 +45,15 @@ public class Database {
         table_train.add(new Train("trainID_5", "Houston", "Dallas", "2024-10-06", "11:00", 24, 150));
         table_train.add(new Train("trainID_6", "Houston", "Dallas", "2024-10-06", "17:00", 24, 110));
 
+        table_train.add(new Train("trainID_7", "HK", "TW", "2024-10-06", "10:00", 24, 110));
+        table_train.add(new Train("trainID_8", "HK", "TW", "2024-10-06", "11:00", 24, 110));
+        table_train.add(new Train("trainID_9", "HK", "TW", "2024-10-06", "12:00", 24, 110));
+        table_train.add(new Train("trainID_10", "HK", "TW", "2024-10-06", "13:00", 24, 110));
+        table_train.add(new Train("trainID_11", "HK", "TW", "2024-10-06", "14:00", 24, 110));
+        table_train.add(new Train("trainID_12", "HK", "TW", "2024-10-06", "15:00", 24, 110));    
+        table_train.add(new Train("trainID_13", "HK", "TW", "2024-10-06", "16:00", 24, 110));
+
+
         // Sample data for Seat Plan
         table_seattingPlan.add(new seatPlan("trainID_1"));
         table_seattingPlan.add(new seatPlan("trainID_2"));

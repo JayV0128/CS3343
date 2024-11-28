@@ -108,7 +108,7 @@ public class Main {
                     case 1:
                         System.out.println("Manage Train Schedule");
                         // ... Implement Manage Train Schedule functionality
-                        train_ticket_system.manageTrainSchedule(scanner);// Corrected method call
+                        manageTrainSchedule(train_ticket_system, scanner);
                         break;
                     case 2:
                         train_ticket_system.viewReports(scanner);
@@ -142,6 +142,87 @@ public class Main {
                         System.out.println("Invalid option. Please try again.");
                 }
             }
+        }
+    }
+
+    // helper function for displaying menu, should not be included in the TrainTicketSystem Controller
+    private static void manageTrainSchedule(TrainTicketSystem train_ticket_system, Scanner scanner) {
+        System.out.println("\n--- Manage Train Schedule ---");
+        System.out.println("1. Add Train");
+        System.out.println("2. Remove Train");
+        System.out.println("3. Update Train");
+        System.out.println("4. View All Trains");
+        System.out.println("5. Back to Admin Menu");
+        System.out.print("Choose an option: ");
+        int choice;
+            choice = scanner.nextInt();
+            scanner.nextLine();
+        
+
+        switch (choice) {
+            case 1:
+                System.out.println("\n--- Add a New Train ---");
+                System.out.println("--- Open Hour: 10:00 - 17:00 ---");
+                System.out.print("Enter Departure Station: ");
+                String departure = scanner.nextLine();
+                System.out.print("Enter Arrival Station: ");
+                String arrival = scanner.nextLine();
+                System.out.print("Enter Departure Date (YYYY-MM-DD): ");
+                String date = scanner.nextLine();
+                System.out.print("Enter Departure Time (HH:MM): ");
+                String time = scanner.nextLine();
+                System.out.print("Enter Ticket Price: ");
+                double price;
+                try {
+                    price = Double.parseDouble(scanner.nextLine());
+                    if (price < 0) {
+                        System.out.println("Price cannot be negative.");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number format for price.");
+                    return;
+                }
+                train_ticket_system.addTrain(departure, arrival, date, time, price);
+                break;
+
+            case 2:
+                System.out.println("\n--- Remove an Existing Train ---");
+                System.out.print("Enter Train ID to Delete: ");
+                String trainID = scanner.nextLine();
+                train_ticket_system.removeTrain(trainID);
+                break;
+
+            case 3:
+                System.out.println("\n--- Update Train Details ---");
+                System.out.print("Enter Train ID to Update: ");
+                trainID = scanner.nextLine();
+                System.out.println("Leave the field empty if you do not want to change it.");
+                System.out.print("Enter New Departure Station: ");
+                departure = scanner.nextLine();
+                System.out.print("Enter New Arrival Station: ");
+                arrival = scanner.nextLine();
+                System.out.print("Enter New Departure Date (YYYY-MM-DD): ");
+                date = scanner.nextLine();
+                System.out.print("Enter New Departure Time (HH:MM): ");
+                time = scanner.nextLine();
+
+                System.out.print("Enter New Ticket Price: ");
+                String priceStr = scanner.nextLine();
+
+                train_ticket_system.updateTrain(trainID, departure, arrival, date, time, priceStr);
+                break;
+
+            case 4:
+                System.out.println("\n--- All Available Trains ---");
+                train_ticket_system.displayTrains_available();
+                break;
+
+            case 5:
+                break;
+
+            default:
+                System.out.println("Invalid option. Please try again.");
         }
     }
 }

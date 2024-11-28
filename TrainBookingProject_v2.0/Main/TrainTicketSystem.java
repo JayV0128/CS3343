@@ -232,7 +232,8 @@ public class TrainTicketSystem {
 		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
 	}
 
-	private int displayTrains_available() {
+	public int displayTrains_available() {
+		System.out.println("\n--- All Available Trains ---");
 		ArrayList<Train> availableTrainTable = trainDAO.getTable_train();
 		int availableTrain_count = 0;
 
@@ -731,108 +732,96 @@ public class TrainTicketSystem {
 		return generateCoupon;
 	}
 
-	// BEGINNING OF ADMIN FUNCTIONS //
+	// BEGINNING OF ADMIN FUNCTIONS
 
-	public void manageTrainSchedule(Scanner scanner) {
-		boolean managing = true;
-		while (managing) {
-			System.out.println("\n--- Manage Train Schedule ---");
-			System.out.println("1. Add Train");
-			System.out.println("2. Remove Train");
-			System.out.println("3. Update Train");
-			System.out.println("4. View All Trains");
-			System.out.println("5. Back to Admin Menu");
-			System.out.print("Choose an option: ");
-			int choice;
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a number between 1 and 5.");
-				scanner.nextLine(); // Clear invalid input
-				continue;
-			}
+	// public void manageTrainSchedule(Scanner scanner) {
+	// 	boolean managing = true;
+	// 	while (managing) {
+	// 		System.out.println("\n--- Manage Train Schedule ---");
+	// 		System.out.println("1. Add Train");
+	// 		System.out.println("2. Remove Train");
+	// 		System.out.println("3. Update Train");
+	// 		System.out.println("4. View All Trains");
+	// 		System.out.println("5. Back to Admin Menu");
+	// 		System.out.print("Choose an option: ");
+	// 		int choice;
+	// 			choice = scanner.nextInt();
+	// 			scanner.nextLine();
+			
 
-			switch (choice) {
-				case 1:
-					addTrain(scanner);
-					break;
+	// 		switch (choice) {
+	// 			case 1:
+	// 				addTrain(scanner);
+	// 				break;
 
-				case 2:
-					removeTrain(scanner);
-					break;
+	// 			case 2:
+	// 				removeTrain(scanner);
+	// 				break;
 
-				case 3:
-					updateTrain(scanner);
-					break;
+	// 			case 3:
+	// 				updateTrain(scanner);
+	// 				break;
 
-				case 4:
-					System.out.println("\n--- All Available Trains ---");
-					displayTrains_available();
-					break;
+	// 			case 4:
+	// 				System.out.println("\n--- All Available Trains ---");
+	// 				displayTrains_available();
+	// 				break;
 
-				case 5:
-					managing = false;
-					break;
+	// 			case 5:
+	// 				managing = false;
+	// 				break;
 
-				default:
-					System.out.println("Invalid option. Please try again.");
-			}
-		}
-	}
+	// 			default:
+	// 				System.out.println("Invalid option. Please try again.");
+	// 		}
+	// 	}
+	// }
 
-	private void addTrain(Scanner scanner) {
-		System.out.println("\n--- Add a New Train ---");
-		System.out.println("--- Open Hour: 10:00 - 17:00 ---");
 
-		String trainID = ("trainId_" + (trainDAO.getTable_train().size() + 1));
+	public ArrayList<String> addTrain(String departure, String arrival, String date, String time, double price) {
+		// System.out.println("\n--- Add a New Train ---");
+		// System.out.println("--- Open Hour: 10:00 - 17:00 ---");
 
-		System.out.print("Enter Departure Station: ");
-		String departure = scanner.nextLine();
+		// String trainID = ("trainId_" + (trainDAO.getTable_train().size() + 1));
 
-		System.out.print("Enter Arrival Station: ");
-		String arrival = scanner.nextLine();
+		// System.out.print("Enter Departure Station: ");
+		// String departure = scanner.nextLine();
 
-		System.out.print("Enter Departure Date (YYYY-MM-DD): ");
-		String date = scanner.nextLine();
+		// System.out.print("Enter Arrival Station: ");
+		// String arrival = scanner.nextLine();
 
-		System.out.print("Enter Departure Time (HH:MM): ");
-		String time = scanner.nextLine();
+		// System.out.print("Enter Departure Date (YYYY-MM-DD): ");
+		// String date = scanner.nextLine();
 
-		// check if there is a train with the same departure, arrival, date, and time
+		// System.out.print("Enter Departure Time (HH:MM): ");
+		// String time = scanner.nextLine();
+
+		// If there is a train with the same departure, arrival, date, and time
 		// --> conflict
+		ArrayList<String> returnVal = new ArrayList<>();
+		String trainID = ("trainId_" + (trainDAO.getTable_train().size() + 1));
 		boolean isConflict = check_TrainConflict(departure, arrival, date, time);
 		if (isConflict) {
 			String newTimeVal = rearrange_new_train_schedule(departure, arrival, date, time);
 			if (newTimeVal == null) {
 				System.out.println("No available time slot for the given date. Please try another date.");
-				return;
+				returnVal.add("false");
+				returnVal.add("No available time slot");
 			} else {
 				time = newTimeVal;
-				System.out.println(
-						"Overlap time slot detected. System automatically rearranged to a compatible time slot. New time slot: "
-								+ time);
-
+				System.out.println( "Overlap time slot detected. System automatically rearranged to a compatible time slot. New time slot: " + time);
+				returnVal.add("true");
+				returnVal.add("Overlap time slot detected, new time slot: " + time);
 			}
+			return returnVal;
 		}
 		int totalSeats = 24;
-
-		System.out.print("Enter Ticket Price: ");
-		double price;
-		try {
-			price = Double.parseDouble(scanner.nextLine());
-			if (price < 0) {
-				System.out.println("Price cannot be negative.");
-				return;
-			}
-		} catch (NumberFormatException e) {
-			System.out.println("Invalid number format for price.");
-			return;
-		}
-
 		Train newTrain = new Train(trainID, departure, arrival, date, time, totalSeats, price);
 		trainDAO.addTrain_fromTrainTable(newTrain);
+		returnVal.add("true");
+		returnVal.add("Train added successfully: " + time);
 		System.out.println("Train added successfully.");
+		return returnVal;
 	}
 
 	private boolean check_TrainConflict(String departure, String arrival, String date, String time) {
@@ -885,88 +874,65 @@ public class TrainTicketSystem {
 		return String.format("%02d:%02d", hour, minute);
 	}
 
-	private void removeTrain(Scanner scanner) {
-		System.out.println("\n--- Remove an Existing Train ---");
-		System.out.print("Enter Train ID to Delete: ");
-		String trainID = scanner.nextLine();
-
+	public ArrayList<String> removeTrain(String trainID) {
 		boolean isDeleted = trainDAO.deleteTrain_fromTrainTable(trainID);
+		ArrayList<String> returnVal = new ArrayList<>();
 		if (isDeleted) {
+			returnVal.add("true");
+			returnVal.add("Train deleted successfully.");
 			System.out.println("Train deleted successfully.");
 		} else {
+			returnVal.add("false");
+			returnVal.add("Train ID not found. Deletion failed.");
 			System.out.println("Train ID not found. Deletion failed.");
 		}
+		return returnVal;
 	}
 
-	private void updateTrain(Scanner scanner) {
-		System.out.println("\n--- Update Train Details ---");
-		System.out.print("Enter Train ID to Update: ");
-		String trainID = scanner.nextLine();
-
+	public ArrayList<String> updateTrain(String trainID, String departure, String arrival, String date, String time, String priceStr) {
+		ArrayList<String> returnVal = new ArrayList<>();
 		Train existingTrain = trainDAO.getTrain_fromTrainTable(trainID);
 		if (existingTrain == null) {
 			System.out.println("Train ID not found.");
-			return;
+			returnVal.add("false");
+			returnVal.add("Train ID not found.");
+			return returnVal;
 		}
 
-		System.out.println("Leave the field empty if you do not want to change it.");
-
-		System.out.print("Enter New Departure Station (Current: " + existingTrain.getDeparture() + "): ");
-		String departure = scanner.nextLine();
 		if (!departure.isEmpty()) {
 			existingTrain.setDeparture(departure);
 		}
 
-		System.out.print("Enter New Arrival Station (Current: " + existingTrain.getArrival() + "): ");
-		String arrival = scanner.nextLine();
 		if (!arrival.isEmpty()) {
 			existingTrain.setArrival(arrival);
 		}
 
-		System.out.print("Enter New Departure Date (YYYY-MM-DD) (Current: " + existingTrain.getDate() + "): ");
-		String date = scanner.nextLine();
 		if (!date.isEmpty()) {
 			existingTrain.setDate(date);
 		}
 
-		System.out.print("Enter New Departure Time (HH:MM) (Current: " + existingTrain.getTime() + "): ");
-		String time = scanner.nextLine();
 		if (!time.isEmpty()) {
 			existingTrain.setTime(time);
 		}
 
-		System.out.print("Enter New Total Seats (Current: " + existingTrain.getAvailableSeats() + "): ");
-		String totalSeatsStr = scanner.nextLine();
-		if (!totalSeatsStr.isEmpty()) {
-			try {
-				int totalSeats = Integer.parseInt(totalSeatsStr);
-				if (totalSeats > 0) {
-					existingTrain.setAvailableSeats(totalSeats);
-				} else {
-					System.out.println("Total seats must be a positive number. Skipping update for seats.");
-				}
-			} catch (NumberFormatException e) {
-				System.out.println("Invalid number format for seats. Skipping update for seats.");
-			}
-		}
-
-		System.out.print("Enter New Ticket Price (Current: " + existingTrain.getPrice() + "): ");
-		String priceStr = scanner.nextLine();
 		if (!priceStr.isEmpty()) {
-			try {
 				double price = Double.parseDouble(priceStr);
 				if (price >= 0) {
 					existingTrain.setPrice(price);
 				} else {
 					System.out.println("Price cannot be negative. Skipping update for price.");
+					returnVal.add("false");
+					returnVal.add("Price cannot be negative.");
+					return returnVal;	
 				}
-			} catch (NumberFormatException e) {
-				System.out.println("Invalid number format for price. Skipping update for price.");
-			}
 		}
 
 		trainDAO.updateTrain_fromTrainTable(existingTrain);
 		System.out.println("Train details updated successfully.");
+		returnVal.add("true");
+		returnVal.add("Train details updated successfully.");
+		returnVal.add(existingTrain.toString());
+		return returnVal;
 	}
 
 	public void csAdmin(Scanner scanner) {
