@@ -926,325 +926,48 @@ public class TrainTicketSystem {
 	}
 
 	// Report methods for admin
-	public void viewReports(Scanner scanner) {
-		Database db = Database.getInstance();
-		boolean viewing = true;
 
-		while (viewing) {
-			System.out.println("\n===== SYSTEM REPORT MENU =====");
-			System.out.println("1. User Report");
-			System.out.println("2. Train Report");
-			System.out.println("3. Order Report");
-			System.out.println("4. Exit Report Menu");
-			System.out.print("Choose a report to view: ");
-			int reportChoice = -1;
 
-			try {
-				reportChoice = scanner.nextInt();
-				scanner.nextLine(); // Consume newline
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a number between 1 and 4.");
-				scanner.nextLine(); // Clear invalid input
-				continue;
-			}
+	public List<User> filterUsersByRole(List<User> users, int roleChoice) {
+        final String role;
+        switch (roleChoice) {
+            case 1:
+                role = "normal";
+                break;
+            case 2:
+                role = "admin";
+                break;
+            default:
+                System.out.println("Invalid role option. Skipping Role filter.");
+                return users;
+        }
 
-			switch (reportChoice) {
-				case 1:
-					generateUserReport(scanner, db.getTable_user());
-					break;
-				case 2:
-					generateTrainReport(scanner, db.getTable_train());
-					break;
-				case 3:
-					generateOrderReport(scanner, db.getTable_orderRecord(), db.getTable_train());
-					break;
-				case 4:
-					viewing = false;
-					System.out.println("Exiting Report Menu.");
-					break;
-				default:
-					System.out.println("Invalid option. Please choose between 1 and 4.");
-			}
-		}
-	}
+        return users.stream()
+                .filter(user -> user.getRole().equalsIgnoreCase(role))
+                .collect(Collectors.toList());
+    }
 
-	private void generateUserReport(Scanner scanner, List<User> users) {
-		System.out.println("\n--- User Report ---");
-		System.out.println("Would you like to apply filters? (Y/N)");
-		String applyFilter = scanner.nextLine().trim().toUpperCase();
-
-		List<User> filteredUsers = new ArrayList<>(users);
-
-		if (applyFilter.equals("Y")) {
-			System.out.println("Select filter option:");
-			System.out.println("1. Filter by Role");
-			System.out.println("2. Search by Username");
-			System.out.println("3. Both Role and Username");
-			System.out.print("Choose an option: ");
-			int filterChoice = -1;
-
-			try {
-				filterChoice = scanner.nextInt();
-				scanner.nextLine();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Skipping filters.");
-				scanner.nextLine();
-				filterChoice = -1;
-			}
-
-			switch (filterChoice) {
-				case 1:
-					filteredUsers = filterUsersByRole(scanner, users);
-					break;
-				case 2:
-					filteredUsers = searchUsersByUsername(scanner, users);
-					break;
-				case 3:
-					filteredUsers = filterUsersByRole(scanner, users);
-					filteredUsers = searchUsersByUsername(scanner, filteredUsers);
-					break;
-				default:
-					System.out.println("Invalid filter option. Showing all users.");
-			}
-		}
-
-		System.out.println("\nTotal Users: " + filteredUsers.size());
-		long normalUsers = filteredUsers.stream()
-				.filter(user -> user.getRole().equalsIgnoreCase("normal"))
-				.count();
-		long adminUsers = filteredUsers.stream()
-				.filter(user -> user.getRole().equalsIgnoreCase("admin"))
-				.count();
-		System.out.println("Normal Users: " + normalUsers);
-		System.out.println("Admin Users: " + adminUsers);
-
-		System.out.print("Would you like to list user details? (Y/N): ");
-		String listDetails = scanner.nextLine().trim().toUpperCase();
-		if (listDetails.equals("Y")) {
-			System.out.println("\n--- User Details ---");
-			for (User user : filteredUsers) {
-				System.out.println("Username: " + user.getUsername() +
-						", Role: " + user.getRole() +
-						", ID: " + user.getId());
-			}
-		}
-	}
-
-	private void generateTrainReport(Scanner scanner, List<Train> trains) {
-		System.out.println("\n--- Train Report ---");
-		System.out.println("Would you like to apply filters? (Y/N)");
-		String applyFilter = scanner.nextLine().trim().toUpperCase();
-
-		List<Train> filteredTrains = new ArrayList<>(trains);
-
-		if (applyFilter.equals("Y")) {
-			System.out.println("Select filter option:");
-			System.out.println("1. Search by Train ID");
-			System.out.println("2. Filter by Departure/Arrival Station");
-			System.out.println("3. Filter by Date Range");
-			System.out.println("4. Combine Filters");
-			System.out.print("Choose an option: ");
-			int filterChoice = -1;
-
-			try {
-				filterChoice = scanner.nextInt();
-				scanner.nextLine();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Skipping filters.");
-				scanner.nextLine();
-				filterChoice = -1;
-			}
-
-			switch (filterChoice) {
-				case 1:
-					filteredTrains = searchTrainsById(scanner, trains);
-					break;
-				case 2:
-					filteredTrains = filterTrainsByStation(scanner, trains);
-					break;
-				case 3:
-					filteredTrains = filterTrainsByDateRange(scanner, trains);
-					break;
-				case 4:
-					filteredTrains = searchTrainsById(scanner, trains);
-					filteredTrains = filterTrainsByStation(scanner, filteredTrains);
-					filteredTrains = filterTrainsByDateRange(scanner, filteredTrains);
-					break;
-				default:
-					System.out.println("Invalid filter option. Showing all trains.");
-			}
-		}
-
-		System.out.println("\nTotal Trains: " + filteredTrains.size());
-		for (Train train : filteredTrains) {
-			int soldSeats = train.getAvailableSeats() - train.getAvailableSeats();
-			System.out.println("Train ID: " + train.getTrainNumber() +
-					", Departure: " + train.getDeparture() +
-					", Arrival: " + train.getArrival() +
-					", Date: " + train.getDate() +
-					", Time: " + train.getTime() +
-					", Total Seats: " + train.getAvailableSeats() +
-					", Sold Seats: " + soldSeats +
-					", Price: $" + String.format("%.2f", train.getPrice()));
-		}
-	}
-
-	private void generateOrderReport(Scanner scanner, List<OrderRecord> orders, List<Train> trains) {
-		System.out.println("\n--- Order Report ---");
-		System.out.println("Would you like to apply filters? (Y/N)");
-		String applyFilter = scanner.nextLine().trim().toUpperCase();
-
-		List<OrderRecord> filteredOrders = new ArrayList<>(orders);
-
-		if (applyFilter.equals("Y")) {
-			System.out.println("Select filter option:");
-			System.out.println("1. Search by Order ID");
-			System.out.println("2. Filter by User ID");
-			System.out.println("3. Filter by Train ID");
-			System.out.println("4. Filter by Date Range");
-			System.out.println("5. Combine Filters");
-			System.out.print("Choose an option: ");
-			int filterChoice = -1;
-
-			try {
-				filterChoice = scanner.nextInt();
-				scanner.nextLine();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Skipping filters.");
-				scanner.nextLine();
-				filterChoice = -1;
-			}
-
-			switch (filterChoice) {
-				case 1:
-					filteredOrders = searchOrdersById(scanner, orders);
-					break;
-				case 2:
-					filteredOrders = filterOrdersByUserId(scanner, orders);
-					break;
-				case 3:
-					filteredOrders = filterOrdersByTrainId(scanner, orders);
-					break;
-				case 4:
-					filteredOrders = filterOrdersByDateRange(scanner, orders);
-					break;
-				case 5:
-					filteredOrders = searchOrdersById(scanner, orders);
-					filteredOrders = filterOrdersByUserId(scanner, filteredOrders);
-					filteredOrders = filterOrdersByTrainId(scanner, filteredOrders);
-					filteredOrders = filterOrdersByDateRange(scanner, filteredOrders);
-					break;
-				default:
-					System.out.println("Invalid filter option. Showing all orders.");
-			}
-		}
-
-		System.out.println("\nTotal Orders: " + filteredOrders.size());
-		double totalRevenue = filteredOrders.stream()
-				.mapToDouble(OrderRecord::getAmount)
-				.sum();
-		System.out.printf("Total Revenue: $%.2f\n", totalRevenue);
-
-		Map<String, List<OrderRecord>> ordersByTrain = filteredOrders.stream()
-				.collect(Collectors.groupingBy(OrderRecord::getTrainId));
-
-		System.out.println("\nOrders and Revenue by Train:");
-		for (Map.Entry<String, List<OrderRecord>> entry : ordersByTrain.entrySet()) {
-			String trainId = entry.getKey();
-			List<OrderRecord> trainOrders = entry.getValue();
-			double trainRevenue = trainOrders.stream()
-					.mapToDouble(OrderRecord::getAmount)
-					.sum();
-			System.out.println("Train ID: " + trainId +
-					", Orders: " + trainOrders.size() +
-					", Revenue: $" + String.format("%.2f", trainRevenue));
-		}
-	}
-
-	private List<User> filterUsersByRole(Scanner scanner, List<User> users) {
-		System.out.println("Select Role to Filter:");
-		System.out.println("1. Normal");
-		System.out.println("2. Admin");
-		System.out.print("Choose an option: ");
-		int roleChoice = -1;
-
-		try {
-			roleChoice = scanner.nextInt();
-			scanner.nextLine();
-		} catch (InputMismatchException e) {
-			System.out.println("Invalid input. Skipping Role filter.");
-			scanner.nextLine(); // Clear invalid input
-			return users;
-		}
-
-		final String role;
-		switch (roleChoice) {
-			case 1:
-				role = "normal";
-				break;
-			case 2:
-				role = "admin";
-				break;
-			default:
-				System.out.println("Invalid role option. Skipping Role filter.");
-				return users;
-		}
-
-		return users.stream()
-				.filter(user -> user.getRole().equalsIgnoreCase(role))
-				.collect(Collectors.toList());
-	}
-
-	private List<User> searchUsersByUsername(Scanner scanner, List<User> users) {
-		System.out.print("Enter the username to search (supports partial matches): ");
-		String usernameSearch = scanner.nextLine().trim().toLowerCase();
-
+	public List<User> searchUsersByUsername(String usernameSearch, List<User> users) {
 		return users.stream()
 				.filter(user -> user.getUsername().toLowerCase().contains(usernameSearch))
 				.collect(Collectors.toList());
 	}
 
-	private List<Train> searchTrainsById(Scanner scanner, List<Train> trains) {
-		System.out.print("Enter the Train ID to search: ");
-		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
-
+	public List<Train> searchTrainsById(String trainIdSearch, List<Train> trains) {
 		return trains.stream()
 				.filter(train -> train.getTrainNumber().toLowerCase().contains(trainIdSearch))
 				.collect(Collectors.toList());
 	}
 
-	private List<Train> filterTrainsByStation(Scanner scanner, List<Train> trains) {
-		System.out.print("Enter Departure Station to filter (leave blank to skip): ");
-		String departure = scanner.nextLine().trim().toLowerCase();
-
-		System.out.print("Enter Arrival Station to filter (leave blank to skip): ");
-		String arrival = scanner.nextLine().trim().toLowerCase();
-
+	public List<Train> filterTrainsByStation(String departure,String arrival, List<Train> trains) {
 		return trains.stream()
 				.filter(train -> (departure.isEmpty() || train.getDeparture().toLowerCase().contains(departure)) &&
 						(arrival.isEmpty() || train.getArrival().toLowerCase().contains(arrival)))
 				.collect(Collectors.toList());
 	}
 
-	private List<Train> filterTrainsByDateRange(Scanner scanner, List<Train> trains) {
-		System.out.print("Enter Start Date (YYYY-MM-DD) or leave blank to skip: ");
-		String startDateStr = scanner.nextLine().trim();
-
-		System.out.print("Enter End Date (YYYY-MM-DD) or leave blank to skip: ");
-		String endDateStr = scanner.nextLine().trim();
-
-		final LocalDate startDateFinal;
-		final LocalDate endDateFinal;
-
-		try {
-
-			startDateFinal = !startDateStr.isEmpty() ? LocalDate.parse(startDateStr) : null;
-			endDateFinal = !endDateStr.isEmpty() ? LocalDate.parse(endDateStr) : null;
-		} catch (DateTimeParseException e) {
-			System.out.println("Invalid date format. Skipping Date Range filter.");
-			return trains;
-		}
-
+	public List<Train> filterTrainsByDateRange(LocalDate startDateFinal,LocalDate endDateFinal, List<Train> trains) {
+		
 		return trains.stream()
 				.filter(train -> {
 					LocalDate trainDate = LocalDate.parse(train.getDate());
@@ -1255,46 +978,25 @@ public class TrainTicketSystem {
 				.collect(Collectors.toList());
 	}
 
-	private List<OrderRecord> searchOrdersById(Scanner scanner, List<OrderRecord> orders) {
-		System.out.print("Enter the Order ID to search: ");
-		String orderIdSearch = scanner.nextLine().trim().toLowerCase();
-
+	public List<OrderRecord> searchOrdersById(String orderIdSearch, List<OrderRecord> orders) {
 		return orders.stream()
 				.filter(order -> order.getOrderId().toLowerCase().contains(orderIdSearch))
 				.collect(Collectors.toList());
 	}
 
-	private List<OrderRecord> filterOrdersByUserId(Scanner scanner, List<OrderRecord> orders) {
-		System.out.print("Enter the User ID to filter orders: ");
-		String userIdSearch = scanner.nextLine().trim().toLowerCase();
-
+	public List<OrderRecord> filterOrdersByUserId(String userIdSearch, List<OrderRecord> orders) {
 		return orders.stream()
 				.filter(order -> order.getUserId().toLowerCase().contains(userIdSearch))
 				.collect(Collectors.toList());
 	}
 
-	private List<OrderRecord> filterOrdersByTrainId(Scanner scanner, List<OrderRecord> orders) {
-		System.out.print("Enter the Train ID to filter orders: ");
-		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
-
+	public List<OrderRecord> filterOrdersByTrainId(String trainIdSearch, List<OrderRecord> orders) {
 		return orders.stream()
 				.filter(order -> order.getTrainId().toLowerCase().contains(trainIdSearch))
 				.collect(Collectors.toList());
 	}
 
-	private List<OrderRecord> filterOrdersByDateRange(Scanner scanner, List<OrderRecord> orders) {
-		System.out.print("Enter Start Date (YYYY-MM-DD) or leave blank to skip: ");
-		String startDateStr = scanner.nextLine().trim();
-
-		System.out.print("Enter End Date (YYYY-MM-DD) or leave blank to skip: ");
-		String endDateStr = scanner.nextLine().trim();
-		final LocalDate startDateFinal = !startDateStr.isEmpty() ? LocalDate.parse(startDateStr) : null;
-		final LocalDate endDateFinal = !endDateStr.isEmpty() ? LocalDate.parse(endDateStr) : null;
-
-		if (startDateFinal != null && endDateFinal != null && startDateFinal.isAfter(endDateFinal)) {
-			System.out.println("Start Date cannot be after End Date. Skipping Date Range filter.");
-			return orders;
-		}
+	public List<OrderRecord> filterOrdersByDateRange(LocalDate startDateFinal,LocalDate endDateFinal,List<OrderRecord> orders) {
 
 		return orders.stream()
 				.filter(order -> {
@@ -1308,94 +1010,6 @@ public class TrainTicketSystem {
 				.collect(Collectors.toList());
 	}
 
-	public void listAllUsers() {
-		ArrayList<User> users = userDAO.getUserList();
-
-		System.out.println("\n--- Registered Users ---");
-		System.out.printf("%-10s %-20s %-10s\n", "User ID", "Username", "Role");
-		System.out.println("-------------------------------------------------");
-		for (User user : users) {
-			System.out.printf("%-10s %-20s %-10s\n", user.getId(), user.getUsername(), user.getRole());
-		}
-	}
-
-	public void addNewUser(String username, String password, String role) {
-		
-
-		if (userDAO.usernameExists(username)) {
-			System.out.println("Username already exists. Please choose a different username.");
-			return;
-		}
-
-
-		boolean success = userDAO.register(role, username, password);
-		if (success) {
-			System.out.println("User added successfully.");
-		} 
-	}
-
-	public void removeUser(String input) {
-		
-
-		User userToRemove = null;
-		userToRemove = userDAO.getUser_fromUserTable(input);
-		if (userToRemove == null) {
-			userToRemove = userDAO.getUserByUsername(input);
-		}
-
-		if (userToRemove == null) {
-			System.out.println("User not found.");
-			
-		}
-
-		return;
-	}
-
-	public void changeUserRole(String input, int roleChoice) {
-
-
-		User userToModify = null;
-		userToModify = userDAO.getUser_fromUserTable(input);
-		if (userToModify == null) {
-			userToModify = userDAO.getUserByUsername(input);
-		}
-
-//		if (userToModify == null) {
-//			System.out.println("User not found.");
-//			return;
-//		}
-//
-//		if (userToModify.getId().equals(currentUser.getId())) {
-//			System.out.println("You cannot change your own role.");
-//			return;
-//		}
-//
-//		
-//
-//		String newRole = userToModify.getRole();
-//		if (roleChoice == 1) {
-//			newRole = "normal";
-//		} else if (roleChoice == 2) {
-//			newRole = "admin";
-//		} else {
-//			System.out.println("Invalid role option. Role not changed.");
-//			return;
-//		}
-//
-//		if (newRole.equalsIgnoreCase(userToModify.getRole())) {
-//			System.out.println("User already has the role '" + newRole + "'. No changes made.");
-//			return;
-//		}
-//
-//		userToModify.setRole(newRole);
-//		boolean success = userDAO.updateUser_fromUserTable(userToModify);
-//
-//		if (success) {
-//			System.out.println("User role updated successfully to '" + newRole + "'.");
-//		} else {
-//			System.out.println("Failed to update user role. Please try again.");
-//		}
-	}
 
 	public void updateAnnouncement(String announcement) {
 		messageCenter.updateAnnouncement(announcement);
@@ -1409,109 +1023,6 @@ public class TrainTicketSystem {
 		userDAO.printUserList();
 	}
 
-	public List<User> generateUserReport(List<User> users, String roleFilter, String usernameSearch) {
-		List<User> filteredUsers = new ArrayList<>(users);
-
-		if (roleFilter != null && !roleFilter.isEmpty()) {
-			filteredUsers = filteredUsers.stream()
-					.filter(user -> user.getRole().equalsIgnoreCase(roleFilter))
-					.collect(Collectors.toList());
-		}
-
-		if (usernameSearch != null && !usernameSearch.isEmpty()) {
-			filteredUsers = filteredUsers.stream()
-					.filter(user -> user.getUsername().toLowerCase().contains(usernameSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		return filteredUsers;
-	}
-
-	public List<Train> generateTrainReport(List<Train> trains, String trainIdSearch, String stationSearch,
-			String startDateStr, String endDateStr, String statusFilter) {
-		List<Train> filteredTrains = new ArrayList<>(trains);
-
-		if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
-			filteredTrains = filteredTrains.stream()
-					.filter(train -> train.getTrainNumber().toLowerCase().contains(trainIdSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		if (stationSearch != null && !stationSearch.isEmpty()) {
-			filteredTrains = filteredTrains.stream()
-					.filter(train -> train.getDeparture().toLowerCase().contains(stationSearch.toLowerCase()) ||
-							train.getArrival().toLowerCase().contains(stationSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		if (startDateStr != null && endDateStr != null) {
-			try {
-				LocalDate startDate = LocalDate.parse(startDateStr);
-				LocalDate endDate = LocalDate.parse(endDateStr);
-
-				filteredTrains = filteredTrains.stream()
-						.filter(train -> {
-							LocalDate trainDate = LocalDate.parse(train.getDate());
-							return (trainDate.isEqual(startDate) || trainDate.isAfter(startDate)) &&
-									(trainDate.isEqual(endDate) || trainDate.isBefore(endDate));
-						})
-						.collect(Collectors.toList());
-			} catch (DateTimeParseException e) {
-				// Handle parsing error
-			}
-		}
-
-		if (statusFilter != null && !statusFilter.isEmpty()) {
-			filteredTrains = filteredTrains.stream()
-					.filter(train -> train.getStatus().equalsIgnoreCase(statusFilter))
-					.collect(Collectors.toList());
-		}
-
-		return filteredTrains;
-	}
-
-	public List<OrderRecord> generateOrderReport(List<OrderRecord> orders, String userIdSearch, String trainIdSearch,
-			String startDateStr, String endDateStr, String orderIdSearch) {
-		List<OrderRecord> filteredOrders = new ArrayList<>(orders);
-
-		if (orderIdSearch != null && !orderIdSearch.isEmpty()) {
-			filteredOrders = filteredOrders.stream()
-					.filter(order -> order.getOrderId().toLowerCase().contains(orderIdSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		if (userIdSearch != null && !userIdSearch.isEmpty()) {
-			filteredOrders = filteredOrders.stream()
-					.filter(order -> order.getUserId().toLowerCase().contains(userIdSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		if (trainIdSearch != null && !trainIdSearch.isEmpty()) {
-			filteredOrders = filteredOrders.stream()
-					.filter(order -> order.getTrainId().toLowerCase().contains(trainIdSearch.toLowerCase()))
-					.collect(Collectors.toList());
-		}
-
-		if (startDateStr != null && endDateStr != null) {
-			try {
-				LocalDate startDate = LocalDate.parse(startDateStr);
-				LocalDate endDate = LocalDate.parse(endDateStr);
-
-				filteredOrders = filteredOrders.stream()
-						.filter(order -> {
-							LocalDate orderDate = order.getOrderDate().toInstant()
-									.atZone(ZoneId.systemDefault())
-									.toLocalDate();
-							return (orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
-									(orderDate.isEqual(endDate) || orderDate.isBefore(endDate));
-						})
-						.collect(Collectors.toList());
-			} catch (DateTimeParseException e) {
-				// Handle parsing error
-			}
-		}
-
-		return filteredOrders;
-	}
+	
 
 }
