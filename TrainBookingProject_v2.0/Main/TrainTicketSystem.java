@@ -255,7 +255,7 @@ public class TrainTicketSystem {
 
 	// recommend train according to user's order history
 	public void displayRecommendations(String id, String location) {
-		ArrayList<String> recommendedTrainIds = recommendTrains(id);
+		ArrayList<String> recommendedTrainIds = recommendTrains(id, location);
 		ArrayList<Train> availableTrains = new ArrayList<>();
 
 		for (int i = 0; i < recommendedTrainIds.size(); i++) {
@@ -273,17 +273,8 @@ public class TrainTicketSystem {
 		if (availableTrains.size() == 0) {
 			System.out.println("No recommendations available.");
 		} else {
-			if (location.equals("None")) {
-				for (int i = 0; i < availableTrains.size(); i++) {
-					System.out.println(availableTrains.get(i).toString());
-				}
-			} else {
-				for (int i = 0; i < availableTrains.size(); i++) {
-					if (availableTrains.get(i).getDeparture().equals(location)
-							|| availableTrains.get(i).getArrival().equals(location)) {
-						System.out.println(availableTrains.get(i).toString());
-					}
-				}
+			for (int i = 0; i < availableTrains.size(); i++) {
+				System.out.println(availableTrains.get(i).toString());
 			}
 		}
 
@@ -292,14 +283,28 @@ public class TrainTicketSystem {
 	}
 
 	// fn to provide recommendations
-	public ArrayList<String> recommendTrains(String id) {
+	public ArrayList<String> recommendTrains(String id, String location) {
 		ArrayList<OrderRecord> orderRecordList = orderRecordDAO.getOrdersByUserId(id);
+		ArrayList<OrderRecord> filteredOrderRecordList = new ArrayList<OrderRecord>();
 
 		if (orderRecordList.isEmpty()) {
 			return new ArrayList<>();
 		} else {
+			if (!location.equals("None")) {
+				// filter out orders that do not match the location
+				for (OrderRecord orderRecord : orderRecordList) {
+					Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+					if (train.getDeparture().equals(location) || train.getArrival().equals(location)) {
+						filteredOrderRecordList.add(orderRecord);
+					}
+				}
+			} else {
+				filteredOrderRecordList = orderRecordList;
+			}
+			
+			
 			Map<String, Integer> trainRating = new HashMap<>();
-			for (OrderRecord orderRecord : orderRecordList) {
+			for (OrderRecord orderRecord : filteredOrderRecordList) {
 				String trainId = orderRecord.getTrainId();
 				int rating = orderRecord.getRating();
 				if (rating > 0) {
@@ -315,7 +320,10 @@ public class TrainTicketSystem {
 					.toList();
 
 			int endIndex = Math.min(3, sortedTrainIds.size());
-			return new ArrayList<>(sortedTrainIds.subList(0, endIndex));
+			ArrayList<String> recommendedTrainIds = new ArrayList<>(sortedTrainIds.subList(0, endIndex));
+			System.out.println(recommendedTrainIds.toString());
+			
+			return recommendedTrainIds;
 		}
 	}
 
