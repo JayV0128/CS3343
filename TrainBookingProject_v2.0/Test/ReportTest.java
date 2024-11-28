@@ -44,6 +44,7 @@ class TrainTicketSystemReportTest {
         dbInstance.getTable_user().clear();
         dbInstance.getTable_train().clear();
         dbInstance.getTable_orderRecord().clear();
+        dbInstance.resetDB();
     }
 
     @Test

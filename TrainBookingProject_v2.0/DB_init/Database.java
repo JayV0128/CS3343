@@ -17,6 +17,10 @@ public class Database {
     // private ArrayList<Passenger> table_passenger;
     private ArrayList<CsQuestion> table_question;
     private ArrayList<Ticket> table_ticket;
+    
+    private ArrayList<User> backup_table_user;
+    private ArrayList<Train> backup_table_train;
+    private ArrayList<OrderRecord> backup_table_orderRecord;
 
     // ID values reference for each table
 
@@ -108,6 +112,10 @@ public class Database {
         table_question
                 .add(new CsQuestion(new ArrayList<String>(Arrays.asList("contact method")),
                         "How to find us : email : 123@123.com, phone : 1234567890"));
+        
+        backup_table_user = new ArrayList<>(table_user);
+        backup_table_train = new ArrayList<>(table_train);
+        backup_table_orderRecord = new ArrayList<>(table_orderRecord);
     }
 
     public ArrayList<User> getTable_user() {
@@ -145,4 +153,9 @@ public class Database {
         return instance;
     }
 
+    public void resetDB() {
+        table_user = new ArrayList<>(backup_table_user);
+        table_train = new ArrayList<>(backup_table_train);
+        table_orderRecord = new ArrayList<>(backup_table_orderRecord);
+    }
 }

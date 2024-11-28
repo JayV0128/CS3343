@@ -71,5 +71,6 @@ class UserDAOTest {
     public void tearDown() throws Exception{
         // Reset the database
         dbInstance.getTable_user().clear();
+        dbInstance.resetDB();
     }
 }
