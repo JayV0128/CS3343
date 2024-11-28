@@ -122,7 +122,7 @@ public class Main {
                         manageTrainSchedule(train_ticket_system, scanner);
                         break;
                     case 2:
-                        train_ticket_system.viewReports(scanner);
+                        viewReports(train_ticket_system,scanner);
                         break;
                     case 3:
                         System.out.println("Display User List");
@@ -393,5 +393,333 @@ public class Main {
 		}
 		System.out.println(
 				"\n=============================================================================================================");
+	}
+	public static void viewReports(TrainTicketSystem trainTicketSystem,Scanner scanner) {
+		Database db = Database.getInstance();
+		boolean viewing = true;
+
+		while (viewing) {
+			System.out.println("\n===== SYSTEM REPORT MENU =====");
+			System.out.println("1. User Report");
+			System.out.println("2. Train Report");
+			System.out.println("3. Order Report");
+			System.out.println("4. Exit Report Menu");
+			System.out.print("Choose a report to view: ");
+			int reportChoice = -1;
+
+			try {
+				reportChoice = scanner.nextInt();
+				scanner.nextLine(); // Consume newline
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input. Please enter a number between 1 and 4.");
+				scanner.nextLine(); // Clear invalid input
+				continue;
+			}
+
+			switch (reportChoice) {
+				case 1:
+				    generateUserReport(trainTicketSystem,scanner, db.getTable_user());
+					break;
+				case 2:
+					generateTrainReport(trainTicketSystem,scanner, db.getTable_train());
+					break;
+				case 3:
+					generateOrderReport(trainTicketSystem,scanner, db.getTable_orderRecord(), db.getTable_train());
+					break;
+				case 4:
+					viewing = false;
+					System.out.println("Exiting Report Menu.");
+					break;
+				default:
+					System.out.println("Invalid option. Please choose between 1 and 4.");
+			}
+		}
+	}
+
+	private static void generateUserReport(TrainTicketSystem trainTicketSystem,Scanner scanner, List<User> users) {
+		System.out.println("\n--- User Report ---");
+		System.out.println("Would you like to apply filters? (Y/N)");
+		String applyFilter = scanner.nextLine().trim().toUpperCase();
+
+		List<User> filteredUsers = new ArrayList<>(users);
+
+		if (applyFilter.equals("Y")) {
+			System.out.println("Select filter option:");
+			System.out.println("1. Filter by Role");
+			System.out.println("2. Search by Username");
+			System.out.println("3. Both Role and Username");
+			System.out.print("Choose an option: ");
+			int filterChoice = -1;
+
+			try {
+				filterChoice = scanner.nextInt();
+				scanner.nextLine();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input. Skipping filters.");
+				scanner.nextLine();
+				filterChoice = -1;
+			}
+
+			switch (filterChoice) {
+				case 1:
+					filteredUsers = filterUsersByRole(trainTicketSystem,scanner, users);
+					break;
+				case 2:
+					filteredUsers = searchUsersByUsername(trainTicketSystem,scanner, users);
+					break;
+				case 3:
+					filteredUsers = filterUsersByRole(trainTicketSystem,scanner, users);
+					filteredUsers = searchUsersByUsername(trainTicketSystem,scanner, filteredUsers);
+					break;
+				default:
+					System.out.println("Invalid filter option. Showing all users.");
+			}
+		}
+
+		System.out.println("\nTotal Users: " + filteredUsers.size());
+		long normalUsers = filteredUsers.stream()
+				.filter(user -> user.getRole().equalsIgnoreCase("normal"))
+				.count();
+		long adminUsers = filteredUsers.stream()
+				.filter(user -> user.getRole().equalsIgnoreCase("admin"))
+				.count();
+		System.out.println("Normal Users: " + normalUsers);
+		System.out.println("Admin Users: " + adminUsers);
+
+		System.out.print("Would you like to list user details? (Y/N): ");
+		String listDetails = scanner.nextLine().trim().toUpperCase();
+		if (listDetails.equals("Y")) {
+			System.out.println("\n--- User Details ---");
+			for (User user : filteredUsers) {
+				System.out.println("Username: " + user.getUsername() +
+						", Role: " + user.getRole() +
+						", ID: " + user.getId());
+			}
+		}
+	}
+
+	private static void generateTrainReport(TrainTicketSystem trainTicketSystem ,Scanner scanner, List<Train> trains) {
+		System.out.println("\n--- Train Report ---");
+		System.out.println("Would you like to apply filters? (Y/N)");
+		String applyFilter = scanner.nextLine().trim().toUpperCase();
+
+		List<Train> filteredTrains = new ArrayList<>(trains);
+
+		if (applyFilter.equals("Y")) {
+			System.out.println("Select filter option:");
+			System.out.println("1. Search by Train ID");
+			System.out.println("2. Filter by Departure/Arrival Station");
+			System.out.println("3. Filter by Date Range");
+			System.out.println("4. Combine Filters");
+			System.out.print("Choose an option: ");
+			int filterChoice = -1;
+
+			try {
+				filterChoice = scanner.nextInt();
+				scanner.nextLine();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input. Skipping filters.");
+				scanner.nextLine();
+				filterChoice = -1;
+			}
+
+			switch (filterChoice) {
+				case 1:
+					filteredTrains = searchTrainsById(trainTicketSystem,scanner, trains);
+					break;
+				case 2:
+					filteredTrains = filterTrainsByStation(trainTicketSystem,scanner, trains);
+					break;
+				case 3:
+					filteredTrains = filterTrainsByDateRange(trainTicketSystem,scanner, trains);
+					break;
+				case 4:
+					filteredTrains = searchTrainsById(trainTicketSystem,scanner, trains);
+					filteredTrains = filterTrainsByStation(trainTicketSystem,scanner, filteredTrains);
+					filteredTrains = filterTrainsByDateRange(trainTicketSystem,scanner, filteredTrains);
+					break;
+				default:
+					System.out.println("Invalid filter option. Showing all trains.");
+			}
+		}
+
+		System.out.println("\nTotal Trains: " + filteredTrains.size());
+		for (Train train : filteredTrains) {
+			int soldSeats = train.getAvailableSeats() - train.getAvailableSeats();
+			System.out.println("Train ID: " + train.getTrainNumber() +
+					", Departure: " + train.getDeparture() +
+					", Arrival: " + train.getArrival() +
+					", Date: " + train.getDate() +
+					", Time: " + train.getTime() +
+					", Total Seats: " + train.getAvailableSeats() +
+					", Sold Seats: " + soldSeats +
+					", Price: $" + String.format("%.2f", train.getPrice()));
+		}
+	}
+
+	private static void generateOrderReport(TrainTicketSystem trainTicketSystem,Scanner scanner, List<OrderRecord> orders, List<Train> trains) {
+		System.out.println("\n--- Order Report ---");
+		System.out.println("Would you like to apply filters? (Y/N)");
+		String applyFilter = scanner.nextLine().trim().toUpperCase();
+
+		List<OrderRecord> filteredOrders = new ArrayList<>(orders);
+
+		if (applyFilter.equals("Y")) {
+			System.out.println("Select filter option:");
+			System.out.println("1. Search by Order ID");
+			System.out.println("2. Filter by User ID");
+			System.out.println("3. Filter by Train ID");
+			System.out.println("4. Filter by Date Range");
+			System.out.println("5. Combine Filters");
+			System.out.print("Choose an option: ");
+			int filterChoice = -1;
+
+			try {
+				filterChoice = scanner.nextInt();
+				scanner.nextLine();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input. Skipping filters.");
+				scanner.nextLine();
+				filterChoice = -1;
+			}
+
+			switch (filterChoice) {
+				case 1:
+					filteredOrders = searchOrdersById(trainTicketSystem,scanner, orders);
+					break;
+				case 2:
+					filteredOrders = filterOrdersByUserId(trainTicketSystem,scanner, orders);
+					break;
+				case 3:
+					filteredOrders = filterOrdersByTrainId(trainTicketSystem,scanner, orders);
+					break;
+				case 4:
+					filteredOrders = filterOrdersByDateRange(trainTicketSystem,scanner, orders);
+					break;
+				case 5:
+					filteredOrders = searchOrdersById(trainTicketSystem,scanner, orders);
+					filteredOrders = filterOrdersByUserId(trainTicketSystem,scanner, filteredOrders);
+					filteredOrders = filterOrdersByTrainId(trainTicketSystem,scanner, filteredOrders);
+					filteredOrders = filterOrdersByDateRange(trainTicketSystem,scanner, filteredOrders);
+					break;
+				default:
+					System.out.println("Invalid filter option. Showing all orders.");
+			}
+		}
+
+		System.out.println("\nTotal Orders: " + filteredOrders.size());
+		double totalRevenue = filteredOrders.stream()
+				.mapToDouble(OrderRecord::getAmount)
+				.sum();
+		System.out.printf("Total Revenue: $%.2f\n", totalRevenue);
+
+		Map<String, List<OrderRecord>> ordersByTrain = filteredOrders.stream()
+				.collect(Collectors.groupingBy(OrderRecord::getTrainId));
+
+		System.out.println("\nOrders and Revenue by Train:");
+		for (Map.Entry<String, List<OrderRecord>> entry : ordersByTrain.entrySet()) {
+			String trainId = entry.getKey();
+			List<OrderRecord> trainOrders = entry.getValue();
+			double trainRevenue = trainOrders.stream()
+					.mapToDouble(OrderRecord::getAmount)
+					.sum();
+			System.out.println("Train ID: " + trainId +
+					", Orders: " + trainOrders.size() +
+					", Revenue: $" + String.format("%.2f", trainRevenue));
+		}
+	}
+    public static List<User> filterUsersByRole(TrainTicketSystem trainTicketSystem, Scanner scanner, List<User> users) {
+        System.out.println("Select Role to Filter:");
+        System.out.println("1. Normal");
+        System.out.println("2. Admin");
+        System.out.print("Choose an option: ");
+        int roleChoice = -1;
+
+        try {
+            roleChoice = scanner.nextInt();
+            scanner.nextLine(); 
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Skipping Role filter.");
+            scanner.nextLine(); 
+            return users; 
+        }
+        return trainTicketSystem.filterUsersByRole(users, roleChoice);
+    }
+
+    public static List<Train> filterTrainsByStation(TrainTicketSystem trainTicketSystem,Scanner scanner, List<Train> trains) {
+		System.out.print("Enter Departure Station to filter (leave blank to skip): ");
+		String departure = scanner.nextLine().trim().toLowerCase();
+
+		System.out.print("Enter Arrival Station to filter (leave blank to skip): ");
+		String arrival = scanner.nextLine().trim().toLowerCase();
+
+		return trainTicketSystem.filterTrainsByStation(departure, arrival, trains);
+	}
+    public static List<Train> filterTrainsByDateRange(TrainTicketSystem trainTicketSystem,Scanner scanner, List<Train> trains) {
+		System.out.print("Enter Start Date (YYYY-MM-DD) or leave blank to skip: ");
+		String startDateStr = scanner.nextLine().trim();
+
+		System.out.print("Enter End Date (YYYY-MM-DD) or leave blank to skip: ");
+		String endDateStr = scanner.nextLine().trim();
+
+		final LocalDate startDateFinal;
+		final LocalDate endDateFinal;
+
+		try {
+
+			startDateFinal = !startDateStr.isEmpty() ? LocalDate.parse(startDateStr) : null;
+			endDateFinal = !endDateStr.isEmpty() ? LocalDate.parse(endDateStr) : null;
+		} catch (DateTimeParseException e) {
+			System.out.println("Invalid date format. Skipping Date Range filter.");
+			return trains;
+		}
+
+		return trainTicketSystem.filterTrainsByDateRange(startDateFinal, endDateFinal, trains);
+	}
+    public static List<OrderRecord> searchOrdersById(TrainTicketSystem trainTicketSystem,Scanner scanner, List<OrderRecord> orders) {
+		System.out.print("Enter the Order ID to search: ");
+		String orderIdSearch = scanner.nextLine().trim().toLowerCase();
+
+		return trainTicketSystem.searchOrdersById(orderIdSearch, orders);
+	}
+    public static List<OrderRecord> filterOrdersByUserId(TrainTicketSystem ticketSystem,Scanner scanner, List<OrderRecord> orders) {
+		System.out.print("Enter the User ID to filter orders: ");
+		String userIdSearch = scanner.nextLine().trim().toLowerCase();
+
+		return ticketSystem.filterOrdersByUserId(userIdSearch, orders);
+	}
+    public static List<OrderRecord> filterOrdersByTrainId(TrainTicketSystem trainTicketSystem,Scanner scanner, List<OrderRecord> orders) {
+		System.out.print("Enter the Train ID to filter orders: ");
+		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
+
+        return trainTicketSystem.filterOrdersByTrainId(trainIdSearch, orders);
+	}
+	public static List<OrderRecord> filterOrdersByDateRange(TrainTicketSystem trainTicketSystem,Scanner scanner, List<OrderRecord> orders) {
+		System.out.print("Enter Start Date (YYYY-MM-DD) or leave blank to skip: ");
+		String startDateStr = scanner.nextLine().trim();
+
+		System.out.print("Enter End Date (YYYY-MM-DD) or leave blank to skip: ");
+		String endDateStr = scanner.nextLine().trim();
+		final LocalDate startDateFinal = !startDateStr.isEmpty() ? LocalDate.parse(startDateStr) : null;
+		final LocalDate endDateFinal = !endDateStr.isEmpty() ? LocalDate.parse(endDateStr) : null;
+
+		if (startDateFinal != null && endDateFinal != null && startDateFinal.isAfter(endDateFinal)) {
+			System.out.println("Start Date cannot be after End Date. Skipping Date Range filter.");
+			return orders;
+		}
+
+		return trainTicketSystem.filterOrdersByDateRange(startDateFinal, endDateFinal, orders);
+	}
+    public static List<User> searchUsersByUsername(TrainTicketSystem trainTicketSystem,Scanner scanner, List<User> users) {
+		System.out.print("Enter the username to search (supports partial matches): ");
+		String usernameSearch = scanner.nextLine().trim().toLowerCase();
+
+		return trainTicketSystem.searchUsersByUsername(usernameSearch, users);
+	}
+    public static List<Train> searchTrainsById(TrainTicketSystem trainTicketSystem,Scanner scanner, List<Train> trains) {
+		System.out.print("Enter the Train ID to search: ");
+		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
+
+		return trainTicketSystem.searchTrainsById(trainIdSearch, trains);
 	}
 }
