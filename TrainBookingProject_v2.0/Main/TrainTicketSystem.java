@@ -735,48 +735,46 @@ public class TrainTicketSystem {
 	// BEGINNING OF ADMIN FUNCTIONS
 
 	// public void manageTrainSchedule(Scanner scanner) {
-	// 	boolean managing = true;
-	// 	while (managing) {
-	// 		System.out.println("\n--- Manage Train Schedule ---");
-	// 		System.out.println("1. Add Train");
-	// 		System.out.println("2. Remove Train");
-	// 		System.out.println("3. Update Train");
-	// 		System.out.println("4. View All Trains");
-	// 		System.out.println("5. Back to Admin Menu");
-	// 		System.out.print("Choose an option: ");
-	// 		int choice;
-	// 			choice = scanner.nextInt();
-	// 			scanner.nextLine();
-			
+	// boolean managing = true;
+	// while (managing) {
+	// System.out.println("\n--- Manage Train Schedule ---");
+	// System.out.println("1. Add Train");
+	// System.out.println("2. Remove Train");
+	// System.out.println("3. Update Train");
+	// System.out.println("4. View All Trains");
+	// System.out.println("5. Back to Admin Menu");
+	// System.out.print("Choose an option: ");
+	// int choice;
+	// choice = scanner.nextInt();
+	// scanner.nextLine();
 
-	// 		switch (choice) {
-	// 			case 1:
-	// 				addTrain(scanner);
-	// 				break;
+	// switch (choice) {
+	// case 1:
+	// addTrain(scanner);
+	// break;
 
-	// 			case 2:
-	// 				removeTrain(scanner);
-	// 				break;
+	// case 2:
+	// removeTrain(scanner);
+	// break;
 
-	// 			case 3:
-	// 				updateTrain(scanner);
-	// 				break;
+	// case 3:
+	// updateTrain(scanner);
+	// break;
 
-	// 			case 4:
-	// 				System.out.println("\n--- All Available Trains ---");
-	// 				displayTrains_available();
-	// 				break;
+	// case 4:
+	// System.out.println("\n--- All Available Trains ---");
+	// displayTrains_available();
+	// break;
 
-	// 			case 5:
-	// 				managing = false;
-	// 				break;
+	// case 5:
+	// managing = false;
+	// break;
 
-	// 			default:
-	// 				System.out.println("Invalid option. Please try again.");
-	// 		}
-	// 	}
+	// default:
+	// System.out.println("Invalid option. Please try again.");
 	// }
-
+	// }
+	// }
 
 	public ArrayList<String> addTrain(String departure, String arrival, String date, String time, double price) {
 		// System.out.println("\n--- Add a New Train ---");
@@ -809,7 +807,9 @@ public class TrainTicketSystem {
 				returnVal.add("No available time slot");
 			} else {
 				time = newTimeVal;
-				System.out.println( "Overlap time slot detected. System automatically rearranged to a compatible time slot. New time slot: " + time);
+				System.out.println(
+						"Overlap time slot detected. System automatically rearranged to a compatible time slot. New time slot: "
+								+ time);
 				returnVal.add("true");
 				returnVal.add("Overlap time slot detected, new time slot: " + time);
 			}
@@ -889,7 +889,8 @@ public class TrainTicketSystem {
 		return returnVal;
 	}
 
-	public ArrayList<String> updateTrain(String trainID, String departure, String arrival, String date, String time, String priceStr) {
+	public ArrayList<String> updateTrain(String trainID, String departure, String arrival, String date, String time,
+			String priceStr) {
 		ArrayList<String> returnVal = new ArrayList<>();
 		Train existingTrain = trainDAO.getTrain_fromTrainTable(trainID);
 		if (existingTrain == null) {
@@ -916,15 +917,15 @@ public class TrainTicketSystem {
 		}
 
 		if (!priceStr.isEmpty()) {
-				double price = Double.parseDouble(priceStr);
-				if (price >= 0) {
-					existingTrain.setPrice(price);
-				} else {
-					System.out.println("Price cannot be negative. Skipping update for price.");
-					returnVal.add("false");
-					returnVal.add("Price cannot be negative.");
-					return returnVal;	
-				}
+			double price = Double.parseDouble(priceStr);
+			if (price >= 0) {
+				existingTrain.setPrice(price);
+			} else {
+				System.out.println("Price cannot be negative. Skipping update for price.");
+				returnVal.add("false");
+				returnVal.add("Price cannot be negative.");
+				return returnVal;
+			}
 		}
 
 		trainDAO.updateTrain_fromTrainTable(existingTrain);

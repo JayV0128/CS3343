@@ -50,21 +50,48 @@ public class Database {
         table_train.add(new Train("trainID_9", "HK", "TW", "2024-10-06", "12:00", 24, 110));
         table_train.add(new Train("trainID_10", "HK", "TW", "2024-10-06", "13:00", 24, 110));
         table_train.add(new Train("trainID_11", "HK", "TW", "2024-10-06", "14:00", 24, 110));
-        table_train.add(new Train("trainID_12", "HK", "TW", "2024-10-06", "15:00", 24, 110));    
+        table_train.add(new Train("trainID_12", "HK", "TW", "2024-10-06", "15:00", 24, 110));
         table_train.add(new Train("trainID_13", "HK", "TW", "2024-10-06", "16:00", 24, 110));
-
 
         // Sample data for Seat Plan
         table_seattingPlan.add(new seatPlan("trainID_1"));
         table_seattingPlan.add(new seatPlan("trainID_2"));
+        table_seattingPlan.add(new seatPlan("trainID_6"));
 
         // test case:index 0 -4 are booked(A1, A2, A3, A4, A5)
         seatPlan sp1 = new seatPlan("trainID_3");
         sp1.updateSeat(0, "X");
         sp1.updateSeat(1, "X");
         sp1.updateSeat(2, "X");
-
         table_seattingPlan.add(sp1);
+
+        seatPlan sp6 = new seatPlan("trainID_6");
+        sp6.updateSeat(0, "X");
+        sp6.updateSeat(1, "X");
+        sp6.updateSeat(2, "X");
+        sp6.updateSeat(3, "X");
+        sp6.updateSeat(4, "X");
+        sp6.updateSeat(5, "X");
+        sp6.updateSeat(6, "X");
+        sp6.updateSeat(7, "X");
+        sp6.updateSeat(8, "X");
+        sp6.updateSeat(9, "X");
+        sp6.updateSeat(10, "X");
+        sp6.updateSeat(11, "X");
+        sp6.updateSeat(12, "X");
+        sp6.updateSeat(13, "X");
+        sp6.updateSeat(14, "X");
+        sp6.updateSeat(15, "X");
+        sp6.updateSeat(16, "X");
+        sp6.updateSeat(17, "X");
+        sp6.updateSeat(18, "X");
+        sp6.updateSeat(19, "X");
+        sp6.updateSeat(20, "X");
+        sp6.updateSeat(21, "X");
+        sp6.updateSeat(22, "X");
+        table_seattingPlan.add(sp6);
+
+        // test case CS question
         table_question.add(new CsQuestion(new ArrayList<String>(Arrays.asList("book", "ticket")),
                 "To book a ticket, you should press 1 in the main menu after login, then follow the instructions to do booking."));
         table_question.add(new CsQuestion(new ArrayList<String>(Arrays.asList("edit", "ticket")),
@@ -76,9 +103,11 @@ public class Database {
         table_question.add(new CsQuestion(new ArrayList<String>(Arrays.asList("customer service")),
                 "If you have any problem, please press 3 to contact customer service."));
         table_question
-                .add(new CsQuestion(new ArrayList<String>(Arrays.asList("help")), "If you have any problem, please press 3 to contact customer service."));
+                .add(new CsQuestion(new ArrayList<String>(Arrays.asList("help")),
+                        "If you have any problem, please press 3 to contact customer service."));
         table_question
-                .add(new CsQuestion(new ArrayList<String>(Arrays.asList("contact method")), "How to find us : email : 123@123.com, phone : 1234567890"));
+                .add(new CsQuestion(new ArrayList<String>(Arrays.asList("contact method")),
+                        "How to find us : email : 123@123.com, phone : 1234567890"));
     }
 
     public ArrayList<User> getTable_user() {
@@ -98,7 +127,7 @@ public class Database {
     }
 
     // public ArrayList<Passenger> getTable_passenger() {
-    //     return getInstance().table_passenger;
+    // return getInstance().table_passenger;
     // }
 
     public ArrayList<CsQuestion> getTable_question() {
