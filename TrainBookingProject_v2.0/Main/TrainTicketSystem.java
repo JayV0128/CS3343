@@ -112,109 +112,117 @@ public class TrainTicketSystem {
 	}
 
 	// fn to order tickets
-	public void bookTickets(Scanner scanner) {
-		if (orderRecordDAO.getOrdersByUserId(currentUser.getId()).size() > 0) {
-			System.out.print("\nDo you need any recommendations? (Y/N) ");
-			String preferences = scanner.nextLine();
-
-			if (preferences.equals("Y")) {
-				System.out.print(
-						"\nPlease enter the location that you might want to depart or arrive [LA, Washington DC, Miami, Chicago, None]: ");
-				String location = scanner.nextLine();
-
-				displayRecommendations(currentUser.getId(), location);
-			}
-		}
-
-		// Base Case: No train recommendations
-		int trainCount = displayTrains_available();
-		System.out.println("\nPlease enter the train number you want to order: ");
-		int trainChoice = scanner.nextInt() - 1;
-
-		if (trainChoice < 0 || trainChoice > trainCount) {
-			System.out.println("Invalid train selection.");
-			return;
-		}
-		Train selectedTrain = trainDAO.getTable_train().get(trainChoice);
-
-		System.out.print("Enter number of passengers: ");
-		int passengerCount = scanner.nextInt();
-
-		ArrayList<Ticket> order_ticketList = new ArrayList<>();
-
-		int seatCount = selectedTrain.getAvailableSeats();
-		if (passengerCount > seatCount) {
-			System.out.println("Not enough seats available.");
-		}
-		double totalPrice = 0;
-		int counter = 0;
-		double ticketPrice = selectedTrain.getPrice();
-
-		while (counter < passengerCount) {
-			System.out.print("Select ticket type (1. Regular, 2. Upgrade(with meal) price = + $30 ): ");
-			int ticketTypeChoice = scanner.nextInt();
-
-			if (ticketTypeChoice == 2) {
-				totalPrice += (ticketPrice + 30);
-			} else if (ticketTypeChoice == 1) {
-				totalPrice += ticketPrice;
-			} else {
-				System.out.println("Invalid ticket type. Please try again.");
-				continue;
-			}
-
-			System.out.println("Passenger " + (counter + 1) + ":");
-			System.out.print("Name: ");
-			String name = scanner.next();
-
-			System.out.print("Age: ");
-			int age = scanner.nextInt();
-			// scanner.nextLine(); // Consume newline
-
-			order_ticketList.add(new Ticket(name, age));
-			counter++;
-		}
-
-		// Seats arrangement -> ticket Info:
-		ArrayList<String> seatNumbersForticket;
-		if (passengerCount > 1 && passengerCount <= 6) {
-			System.out.println("Would you like to arrange seats together? (Y/N)");
-			String preference = scanner.next();
-			if (preference.equals("Y")) {
-				seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
-			} else {
-				seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber());
-
-			}
-		} else if (passengerCount > 6) {
-			System.out.println("Seats will be arranged randomly.");
-			seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
-		} else {
-			System.out.println("Seats will be arranged randomly.");
-			seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber());
-		}
-
-		// test:
-		// System.out.println("test_seats are: " + seatNumbersForticket);
-		// System.out.println("test_seats left: " + selectedTrain.getAvailableSeats());
-
-		// Ticket Info:
-		// ...
-
-		OrderRecord orderRecord = new OrderRecord(
-				String.format("orderID_%s_%s", currentUser.getId(),
-						orderRecordDAO.getOrdersByUserId(currentUser.getId()).size()),
-				currentUser.getId(),
-				selectedTrain.getTrainNumber(),
-				new Date(),
-				getTotalPriceWithDiscount(totalPrice), // tmp
-				// order_passengerList, // tmp
-				order_ticketList// tmp
-		);
-
-		orderRecordDAO.addOrderRecord(orderRecord);
-
-		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
+//	public void bookTickets(Scanner scanner) {
+//		if (orderRecordDAO.getOrdersByUserId(currentUser.getId()).size() > 0) {
+//			System.out.print("\nDo you need any recommendations? (Y/N) ");
+//			String preferences = scanner.nextLine();
+//
+//			if (preferences.equals("Y")) {
+//				System.out.print(
+//						"\nPlease enter the location that you might want to depart or arrive [LA, Washington DC, Miami, Chicago, None]: ");
+//				String location = scanner.nextLine();
+//
+//				displayRecommendations(currentUser.getId(), location);
+//			}
+//		}
+//
+//		// Base Case: No train recommendations
+//		int trainCount = displayTrains_available();
+//		System.out.println("\nPlease enter the train number you want to order: ");
+//		int trainChoice = scanner.nextInt() - 1;
+//
+//		if (trainChoice < 0 || trainChoice > trainCount) {
+//			System.out.println("Invalid train selection.");
+//			return;
+//		}
+//		Train selectedTrain = trainDAO.getTable_train().get(trainChoice);
+//
+//		System.out.print("Enter number of passengers: ");
+//		int passengerCount = scanner.nextInt();
+//
+//		ArrayList<Ticket> order_ticketList = new ArrayList<>();
+//
+//		int seatCount = selectedTrain.getAvailableSeats();
+//		if (passengerCount > seatCount) {
+//			System.out.println("Not enough seats available.");
+//		}
+//		double totalPrice = 0;
+//		int counter = 0;
+//		double ticketPrice = selectedTrain.getPrice();
+//
+//		while (counter < passengerCount) {
+//			System.out.print("Select ticket type (1. Regular, 2. Upgrade(with meal) price = + $30 ): ");
+//			int ticketTypeChoice = scanner.nextInt();
+//
+//			if (ticketTypeChoice == 2) {
+//				totalPrice += (ticketPrice + 30);
+//			} else if (ticketTypeChoice == 1) {
+//				totalPrice += ticketPrice;
+//			} else {
+//				System.out.println("Invalid ticket type. Please try again.");
+//				continue;
+//			}
+//
+//			System.out.println("Passenger " + (counter + 1) + ":");
+//			System.out.print("Name: ");
+//			String name = scanner.next();
+//
+//			System.out.print("Age: ");
+//			int age = scanner.nextInt();
+//			// scanner.nextLine(); // Consume newline
+//
+//			order_ticketList.add(new Ticket(name, age));
+//			counter++;
+//		}
+//
+//		// Seats arrangement -> ticket Info:
+//		ArrayList<String> seatNumbersForticket;
+//		if (passengerCount > 1 && passengerCount <= 6) {
+//			System.out.println("Would you like to arrange seats together? (Y/N)");
+//			String preference = scanner.next();
+//			if (preference.equals("Y")) {
+//				seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
+//			} else {
+//				seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber());
+//
+//			}
+//		} else if (passengerCount > 6) {
+//			System.out.println("Seats will be arranged randomly.");
+//			seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
+//		} else {
+//			System.out.println("Seats will be arranged randomly.");
+//			seatNumbersForticket = arrangeSeat(selectedTrain.getTrainNumber());
+//		}
+//
+//		// test:
+//		// System.out.println("test_seats are: " + seatNumbersForticket);
+//		// System.out.println("test_seats left: " + selectedTrain.getAvailableSeats());
+//
+//		// Ticket Info:
+//		// ...
+//
+//		OrderRecord orderRecord = new OrderRecord(
+//				String.format("orderID_%s_%s", currentUser.getId(),
+//						orderRecordDAO.getOrdersByUserId(currentUser.getId()).size()),
+//				currentUser.getId(),
+//				selectedTrain.getTrainNumber(),
+//				new Date(),
+//				getTotalPriceWithDiscount(totalPrice), // tmp
+//				// order_passengerList, // tmp
+//				order_ticketList// tmp
+//		);
+//
+//		orderRecordDAO.addOrderRecord(orderRecord);
+//
+//		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
+//	}
+	
+	public boolean hasOrders() {
+		return orderRecordDAO.getOrdersByUserId(currentUser.getId()).size() > 0;
+	}
+	
+	public Train selectTrain(int trainChoice) {
+		return trainDAO.getTable_train().get(trainChoice);
 	}
 
 	public int displayTrains_available() {
@@ -372,6 +380,15 @@ public class TrainTicketSystem {
 		return result;
 
 	}
+	
+	public OrderRecord createOrder(User currentUser, String trainID, double totalPrice, ArrayList<Ticket> ticketList) {
+		OrderRecord orderRecord = new OrderRecord(
+				String.format("orderID_%s_%s", currentUser.getId(),
+						orderRecordDAO.getOrdersByUserId(currentUser.getId()).size()),
+				currentUser.getId(), trainID, new Date(), getTotalPriceWithDiscount(totalPrice), ticketList);
+		orderRecordDAO.addOrderRecord(orderRecord);
+		return orderRecord;
+    }
 
 	// fn to check tickets (more like check orders)
 	public void viewOrders(Scanner scanner) {

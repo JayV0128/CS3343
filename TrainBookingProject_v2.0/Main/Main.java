@@ -76,7 +76,7 @@ public class Main {
 
                 switch (option) {
                     case 1:
-                        train_ticket_system.bookTickets(scanner);
+                        bookTickets(train_ticket_system, current_LoginedUser, scanner);
                         break;
 
                     case 2:
@@ -152,102 +152,6 @@ public class Main {
                         // Cancel an Announcement
                         train_ticket_system.updateAnnouncement(null);
                         System.out.println("Announcement cancelled successfully.\n");
-                        break;
-                    case 8:
-                        // Cancel an Announcement
-                    	boolean managing = true;
-                		while (managing) {
-                			System.out.println("\n--- Manage Users ---");
-                			System.out.println("1. List All Users");
-                			System.out.println("2. Add New User");
-                			System.out.println("3. Remove User");
-                			System.out.println("4. Change User Role");
-                			System.out.println("5. Return to Admin Menu");
-                			System.out.print("Choose an option: ");
-
-                			int choice = -1;
-                			try {
-                				choice = scanner.nextInt();
-                				scanner.nextLine();
-                			} catch (InputMismatchException e) {
-                				System.out.println("Invalid input. Please enter a number between 1 and 5.");
-                				scanner.nextLine();
-                				continue;
-                			}
-
-                			switch (choice) {
-                				case 1:
-                					train_ticket_system.listAllUsers();
-                					break;
-                				case 2:
-                					System.out.println("\n--- Add New User ---");
-                					System.out.print("Enter Username: ");
-                					String username = scanner.nextLine();
-                					if (username.isEmpty()) {
-                						System.out.println("Username cannot be empty.");
-                						return;
-                					}
-                					System.out.print("Enter Password: ");
-                					String password = scanner.nextLine();
-                					if (password.isEmpty()) {
-                						System.out.println("Password cannot be empty.");
-                						return;
-                					}
-                					System.out.println("Select Role:");
-                					System.out.println("1. Normal User");
-                					System.out.println("2. Administrator");
-                					System.out.print("Choose an option: ");
-                					int roleChoice = -1;
-                					try {
-                						roleChoice = scanner.nextInt();
-                						scanner.nextLine();
-                					} catch (InputMismatchException e) {
-                						System.out.println("Invalid input. Role set to 'normal user' by default.");
-                						scanner.nextLine();
-                						roleChoice = 1;
-                					}		
-                					String role = "normal";
-                					if (roleChoice == 2) {
-                						role = "admin";
-                					}
-                					train_ticket_system.addNewUser(username, password, role);
-                					break;
-                				case 3:
-                					System.out.println("\n--- Remove User ---");
-                					System.out.print("Enter the User ID or Username to remove: ");
-                					String input = scanner.nextLine().trim();
-                					train_ticket_system.removeUser(input);
-                					break;
-                				case 4:
-                					System.out.println("\n--- Change User Role ---");
-                					System.out.print("Enter the User ID or Username to modify: ");
-                					input = scanner.nextLine().trim();
-                					
-                					
-                					System.out.println("Select New Role:");
-                					System.out.println("1. Normal User");
-                					System.out.println("2. Administrator");
-                					System.out.print("Choose an option: ");
-
-                					roleChoice = -1;
-                					try {
-                						roleChoice = scanner.nextInt();
-                						scanner.nextLine();
-                					} catch (InputMismatchException e) {
-                						System.out.println("Invalid input. Role not changed.");
-                						scanner.nextLine();
-                						return;
-                					}
-                					train_ticket_system.changeUserRole(input, roleChoice);
-                					break;
-                				case 5:
-                					managing = false;
-                					System.out.println("Returning to Admin Menu.");
-                					break;
-                				default:
-                					System.out.println("Invalid option. Please choose between 1 and 5.");
-                			}
-                		}
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");
@@ -726,5 +630,99 @@ public class Main {
 		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
 
 		return trainTicketSystem.searchTrainsById(trainIdSearch, trains);
+	}
+    
+    private static void bookTickets(TrainTicketSystem tts, User currentUser, Scanner scanner) {
+		if (tts.hasOrders()) {
+			System.out.print("\nDo you need any recommendations? (Y/N) ");
+			String preferences = scanner.nextLine();
+
+			if (preferences.equals("Y")) {
+				System.out.print(
+						"\nPlease enter the location that you might want to depart or arrive [LA, Washington DC, Miami, Chicago, None]: ");
+				String location = scanner.nextLine();
+
+				tts.displayRecommendations(currentUser.getId(), location);
+			}
+		}
+
+		// Base Case: No train recommendations
+		int trainCount = tts.displayTrains_available();
+		System.out.println("\nPlease enter the train number you want to order: ");
+		int trainChoice = scanner.nextInt() - 1;
+
+		if (trainChoice < 0 || trainChoice > trainCount) {
+			System.out.println("Invalid train selection.");
+			return;
+		}
+		Train selectedTrain = tts.selectTrain(trainChoice);
+
+		System.out.print("Enter number of passengers: ");
+		int passengerCount = scanner.nextInt();
+
+		ArrayList<Ticket> order_ticketList = new ArrayList<>();
+
+		int seatCount = selectedTrain.getAvailableSeats();
+		if (passengerCount > seatCount) {
+			System.out.println("Not enough seats available.");
+		}
+		double totalPrice = 0;
+		int counter = 0;
+		double ticketPrice = selectedTrain.getPrice();
+
+		while (counter < passengerCount) {
+			System.out.print("Select ticket type (1. Regular, 2. Upgrade(with meal) price = + $30 ): ");
+			int ticketTypeChoice = scanner.nextInt();
+
+			if (ticketTypeChoice == 2) {
+				totalPrice += (ticketPrice + 30);
+			} else if (ticketTypeChoice == 1) {
+				totalPrice += ticketPrice;
+			} else {
+				System.out.println("Invalid ticket type. Please try again.");
+				continue;
+			}
+
+			System.out.println("Passenger " + (counter + 1) + ":");
+			System.out.print("Name: ");
+			String name = scanner.next();
+
+			System.out.print("Age: ");
+			int age = scanner.nextInt();
+			// scanner.nextLine(); // Consume newline
+
+			order_ticketList.add(new Ticket(name, age));
+			counter++;
+		}
+
+		// Seats arrangement -> ticket Info:
+		ArrayList<String> seatNumbersForticket;
+		if (passengerCount > 1 && passengerCount <= 6) {
+			System.out.println("Would you like to arrange seats together? (Y/N)");
+			String preference = scanner.next();
+			if (preference.equals("Y")) {
+				seatNumbersForticket = tts.arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
+			} else {
+				seatNumbersForticket = tts.arrangeSeat(selectedTrain.getTrainNumber());
+
+			}
+		} else if (passengerCount > 6) {
+			System.out.println("Seats will be arranged randomly.");
+			seatNumbersForticket = tts.arrangeSeat(selectedTrain.getTrainNumber(), passengerCount);
+		} else {
+			System.out.println("Seats will be arranged randomly.");
+			seatNumbersForticket = tts.arrangeSeat(selectedTrain.getTrainNumber());
+		}
+
+		// test:
+		// System.out.println("test_seats are: " + seatNumbersForticket);
+		// System.out.println("test_seats left: " + selectedTrain.getAvailableSeats());
+
+		// Ticket Info:
+		// ...
+
+		OrderRecord orderRecord = tts.createOrder(currentUser, selectedTrain.getTrainNumber(), totalPrice, order_ticketList);
+
+		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
 	}
 }
