@@ -576,40 +576,6 @@ public class TrainTicketSystem {
 		}
 	}
 
-	public void cs(Scanner scanner) {
-		boolean isStay = true;
-
-		// Welcome message
-		System.out.println(
-				"\n=============================================================================================================");
-		System.out.println(
-				"CSer : Hi, welcome to customer service, how can I help you? (type your question or type exit to return to the main menu)");
-
-		// Main loop
-		while (isStay) {
-			System.out.print("You : ");
-			String question = scanner.nextLine(); // Get user input
-
-			// Process the input
-			String response = getAnswer(question);
-
-			// Print the response
-			System.out.println(response);
-
-			// Check if the user wants to exit
-			if (question.equalsIgnoreCase("exit")) {
-				isStay = false;
-			} else {
-				System.out
-						.println("CSer : Anything else? (type your question or type exit to return to the main menu)");
-			}
-		}
-
-		// Exit message
-		System.out.println(
-				"\n=============================================================================================================");
-	}
-
 	// fn to find answer by keyword
 	public String getAnswer(String question) {
 		if (question == null || question.trim().isEmpty()) {
@@ -920,35 +886,6 @@ public class TrainTicketSystem {
 		returnVal.add("Train details updated successfully.");
 		returnVal.add(existingTrain.toString());
 		return returnVal;
-	}
-
-	public void csAdmin(Scanner scanner) {
-		boolean isStay = true;
-		System.out.println(
-				"\n=============================================================================================================");
-		while (isStay) {
-			String answer = "";
-			String keywordInput = null;
-			ArrayList<String> keywords = new ArrayList<>();
-
-			System.out.println("Enter keywords (separated by commas):");
-			keywordInput = scanner.nextLine();
-			if (keywordInput.equals("exit")) {
-				isStay = false;
-			}
-			if (isStay != false) {
-				System.out.println("Enter answer:");
-				answer = scanner.nextLine();
-			}
-			if (answer.equals("exit")) {
-				isStay = false;
-			}
-			if (isStay != false) {
-				System.out.println(addQA(keywordInput, answer));
-			}
-		}
-		System.out.println(
-				"\n=============================================================================================================");
 	}
 
 	// fn to find answer by keyword

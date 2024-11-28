@@ -59,5 +59,6 @@ class TrainDAOTest {
     void tearDown() {
         // Reset the database
         dbInstance.getTable_train().clear();
+        dbInstance.resetDB();
     }
 }

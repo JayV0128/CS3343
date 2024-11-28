@@ -80,7 +80,7 @@ public class Main {
 
                     // CS function
                     case 3:
-                        train_ticket_system.cs(scanner);
+                    	cs(train_ticket_system,scanner);
                         break;
 
                     case 4:
@@ -134,7 +134,7 @@ public class Main {
                         System.out.println("Logged out successfully.\n");
                         break;
                     case 5:
-                        train_ticket_system.csAdmin(scanner);
+                    	csAdmin(train_ticket_system,scanner);
                         break;
                     case 6:
                         // Update an Announcement
@@ -331,4 +331,67 @@ public class Main {
                 System.out.println("Invalid option. Please try again.");
         }
     }
+    
+    public static void cs(TrainTicketSystem train_ticket_system,Scanner scanner) {
+		boolean isStay = true;
+
+		// Welcome message
+		System.out.println(
+				"\n=============================================================================================================");
+		System.out.println(
+				"CSer : Hi, welcome to customer service, how can I help you? (type your question or type exit to return to the main menu)");
+
+		// Main loop
+		while (isStay) {
+			System.out.print("You : ");
+			String question = scanner.nextLine(); // Get user input
+
+			// Process the input
+			String response = train_ticket_system.getAnswer(question);
+
+			// Print the response
+			System.out.println(response);
+
+			// Check if the user wants to exit
+			if (question.equalsIgnoreCase("exit")) {
+				isStay = false;
+			} else {
+				System.out
+						.println("CSer : Anything else? (type your question or type exit to return to the main menu)");
+			}
+		}
+
+		// Exit message
+		System.out.println(
+				"\n=============================================================================================================");
+	}
+    
+    public static void csAdmin(TrainTicketSystem train_ticket_system,Scanner scanner) {
+		boolean isStay = true;
+		System.out.println(
+				"\n=============================================================================================================");
+		while (isStay) {
+			String answer = "";
+			String keywordInput = null;
+			ArrayList<String> keywords = new ArrayList<>();
+
+			System.out.println("Enter keywords (separated by commas):");
+			keywordInput = scanner.nextLine();
+			if (keywordInput.equals("exit")) {
+				isStay = false;
+			}
+			if (isStay != false) {
+				System.out.println("Enter answer:");
+				answer = scanner.nextLine();
+			}
+			if (answer.equals("exit")) {
+				isStay = false;
+			}
+			if (isStay != false) {
+				System.out.println(train_ticket_system.addQA(keywordInput, answer));
+			}
+		}
+		System.out.println(
+				"\n=============================================================================================================");
+	}
 }
