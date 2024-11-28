@@ -14,7 +14,8 @@ public class AccountControlTest extends TestCase{
   @Test
   public void testRegisterSucessful() {
 	  TrainTicketSystem tts  = new TrainTicketSystem();
-	  boolean result = tts.register("test", "test");
+	  boolean result = tts.register("123", "123");
+	  tts.displayUserList();
   }
   
   @Test

@@ -1356,11 +1356,11 @@ public class TrainTicketSystem {
 			userToModify = userDAO.getUserByUsername(input);
 		}
 
-		if (userToModify == null) {
-			System.out.println("User not found.");
-			return;
-		}
-
+//		if (userToModify == null) {
+//			System.out.println("User not found.");
+//			return;
+//		}
+//
 //		if (userToModify.getId().equals(currentUser.getId())) {
 //			System.out.println("You cannot change your own role.");
 //			return;
