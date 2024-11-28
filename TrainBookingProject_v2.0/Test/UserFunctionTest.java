@@ -43,7 +43,7 @@ public class UserFunctionTest {
 	  
 	  
 
-	  assertNull(userDAO.getUser_fromUserTable("userID_7"));
+	  assertNull(userDAO.getUser_fromUserTable("userID_111"));
 	  User b = userDAO.getUser_fromUserTable("userID_3");
 
 	  
