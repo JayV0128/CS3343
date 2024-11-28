@@ -633,7 +633,7 @@ public class Main {
 	}
     
     private static void bookTickets(TrainTicketSystem tts, User currentUser, Scanner scanner) {
-		if (tts.hasOrders()) {
+		if (tts.hasOrders(currentUser)) {
 			System.out.print("\nDo you need any recommendations? (Y/N) ");
 			String preferences = scanner.nextLine();
 
@@ -649,13 +649,13 @@ public class Main {
 		// Base Case: No train recommendations
 		int trainCount = tts.displayTrains_available();
 		System.out.println("\nPlease enter the train number you want to order: ");
-		int trainChoice = scanner.nextInt() - 1;
-
-		if (trainChoice < 0 || trainChoice > trainCount) {
+		int trainChoice = scanner.nextInt();
+		Train selectedTrain = tts.selectTrain(trainChoice);
+		
+		if (selectedTrain == null) {
 			System.out.println("Invalid train selection.");
 			return;
 		}
-		Train selectedTrain = tts.selectTrain(trainChoice);
 
 		System.out.print("Enter number of passengers: ");
 		int passengerCount = scanner.nextInt();

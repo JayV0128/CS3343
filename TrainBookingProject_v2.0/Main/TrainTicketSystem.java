@@ -217,12 +217,16 @@ public class TrainTicketSystem {
 //		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
 //	}
 	
-	public boolean hasOrders() {
+	public boolean hasOrders(User currentUser) {
 		return orderRecordDAO.getOrdersByUserId(currentUser.getId()).size() > 0;
 	}
 	
 	public Train selectTrain(int trainChoice) {
-		return trainDAO.getTable_train().get(trainChoice);
+		if (trainChoice < 1 || trainChoice > trainDAO.getTable_train().size()) {
+			return null;
+		} else {
+			return trainDAO.getTable_train().get(trainChoice - 1);
+		}
 	}
 
 	public int displayTrains_available() {
@@ -246,7 +250,7 @@ public class TrainTicketSystem {
 		return availableTrain_count;
 	}
 
-	public double getTotalPriceWithDiscount(Double totalPrice) {
+	public double getTotalPriceWithDiscount(User currentUser, double totalPrice) {
 		double discount = currentUser.getMember().getDiscount();
 
 		double result = 0;
@@ -385,7 +389,7 @@ public class TrainTicketSystem {
 		OrderRecord orderRecord = new OrderRecord(
 				String.format("orderID_%s_%s", currentUser.getId(),
 						orderRecordDAO.getOrdersByUserId(currentUser.getId()).size()),
-				currentUser.getId(), trainID, new Date(), getTotalPriceWithDiscount(totalPrice), ticketList);
+				currentUser.getId(), trainID, new Date(), getTotalPriceWithDiscount(currentUser, totalPrice), ticketList);
 		orderRecordDAO.addOrderRecord(orderRecord);
 		return orderRecord;
     }
