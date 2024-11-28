@@ -1009,6 +1009,82 @@ public class TrainTicketSystem {
 				})
 				.collect(Collectors.toList());
 	}
+	public void listAllUsers() {
+		ArrayList<User> users = userDAO.getUserList();
+		System.out.println("\n--- Registered Users ---");
+		System.out.printf("%-10s %-20s %-10s\n", "User ID", "Username", "Role");
+		System.out.println("-------------------------------------------------");
+		for (User user : users) {
+			System.out.printf("%-10s %-20s %-10s\n", user.getId(), user.getUsername(), user.getRole());
+		}
+	}
+	public void addNewUser(String username, String password, String role) {
+		
+		if (userDAO.usernameExists(username)) {
+			System.out.println("Username already exists. Please choose a different username.");
+			return;
+		}
+		boolean success = userDAO.register(role, username, password);
+		if (success) {
+			System.out.println("User added successfully.");
+		} 
+	}
+	public void removeUser(String input) {
+		
+		User userToRemove = null;
+		userToRemove = userDAO.getUser_fromUserTable(input);
+		if (userToRemove == null) {
+			userToRemove = userDAO.getUserByUsername(input);
+		}
+		if (userToRemove == null) {
+			System.out.println("User not found.");
+			
+		}
+		return;
+	}
+	public void changeUserRole(String input, int roleChoice) {
+		User userToModify = null;
+		userToModify = userDAO.getUser_fromUserTable(input);
+		if (userToModify == null) {
+			userToModify = userDAO.getUserByUsername(input);
+		}
+//		if (userToModify == null) {
+//			System.out.println("User not found.");
+//			return;
+//		}
+//
+//		if (userToModify.getId().equals(currentUser.getId())) {
+//			System.out.println("You cannot change your own role.");
+//			return;
+//		}
+//
+//		
+//
+//		String newRole = userToModify.getRole();
+//		if (roleChoice == 1) {
+//			newRole = "normal";
+//		} else if (roleChoice == 2) {
+//			newRole = "admin";
+//		} else {
+//			System.out.println("Invalid role option. Role not changed.");
+//			return;
+//		}
+//
+//		if (newRole.equalsIgnoreCase(userToModify.getRole())) {
+//			System.out.println("User already has the role '" + newRole + "'. No changes made.");
+//			return;
+//		}
+//
+//		userToModify.setRole(newRole);
+//		boolean success = userDAO.updateUser_fromUserTable(userToModify);
+//
+//		if (success) {
+//			System.out.println("User role updated successfully to '" + newRole + "'.");
+//		} else {
+//			System.out.println("Failed to update user role. Please try again.");
+//		}
+	}
+
 
 
 	public void updateAnnouncement(String announcement) {
