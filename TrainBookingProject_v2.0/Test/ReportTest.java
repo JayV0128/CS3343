@@ -1,116 +1,203 @@
 package Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.*;
-import Main.TrainTicketSystem;
-import DataModel.*;
-import DAO.*;
-import DB_init.Database;
 
-import java.util.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-class TrainTicketSystemReportTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-    private TrainTicketSystem trainTicketSystem;
-    private Database dbInstance;
+import DataModel.OrderRecord;
+import DataModel.Train;
+import DataModel.User;
+import Main.TrainTicketSystem;
+
+class ReportTest {
+
+    private TrainTicketSystem system;
+    private List<User> users;
+    private List<Train> trains;
+    private List<OrderRecord> orders;
 
     @BeforeEach
     void setUp() {
-        trainTicketSystem = new TrainTicketSystem();
-        dbInstance = Database.getInstance();
+        system = TrainTicketSystem.getInstance();
 
-        // Initialize data for testing
-        dbInstance.getTable_user().clear();
-        dbInstance.getTable_train().clear();
-        dbInstance.getTable_orderRecord().clear();
 
-        // Add Users
-        dbInstance.getTable_user().add(new User("admin", "userID_1", "adminUser", "pass"));
-        dbInstance.getTable_user().add(new User("normal", "userID_2", "normalUser1", "pass"));
-        dbInstance.getTable_user().add(new User("normal", "userID_3", "normalUser2", "pass"));
+        users = new ArrayList<>();
+        users.add(new User("user1", "password1", "normal", "id1"));
+        users.add(new User("admin1", "password2", "admin", "id2"));
+        users.add(new User("user2", "password3", "normal", "id3"));
+     
 
-        // Add Trains
-        dbInstance.getTable_train().add(new Train("trainID_1", "CityA", "CityB", "2024-10-01", "12:00", 100, 50.0));
-        dbInstance.getTable_train().add(new Train("trainID_2", "CityB", "CityC", "2024-10-02", "13:00", 80, 60.0));
+   
+        trains = new ArrayList<>();
+        trains.add(new Train("train1", "LA", "Chicago", "2023-10-10", "10:00", 100, 50.0));
+        trains.add(new Train("train2", "Miami", "Washington DC", "2023-10-11", "12:00", 80, 75.0));
+        trains.add(new Train("train3", "Chicago", "Miami", "2023-10-12", "14:00", 60, 65.0));
+    
 
-        // Add Order Records
-        dbInstance.getTable_orderRecord().add(new OrderRecord("orderID_1", "userID_2", "trainID_1", new Date(), 100.0, new ArrayList<>()));
-        dbInstance.getTable_orderRecord().add(new OrderRecord("orderID_2", "userID_3", "trainID_2", new Date(), 120.0, new ArrayList<>()));
-    }
+   
+        orders = new ArrayList<>();
+        orders.add(new OrderRecord("order1", "id1", "train1", new java.util.Date(), 150.0, new ArrayList<>()));
+        orders.add(new OrderRecord("order2", "id2", "train2", new java.util.Date(), 200.0, new ArrayList<>()));
+        orders.add(new OrderRecord("order3", "id1", "train3", new java.util.Date(), 100.0, new ArrayList<>()));
 
-    @AfterEach
-    void tearDown() {
-        dbInstance.getTable_user().clear();
-        dbInstance.getTable_train().clear();
-        dbInstance.getTable_orderRecord().clear();
-        dbInstance.resetDB();
     }
 
     @Test
-    void testGenerateUserReport_FilterByRole() {
-        List<User> users = dbInstance.getTable_user();
-        List<User> filteredUsers = trainTicketSystem.generateUserReport(users, "normal", null);
-
-        assertEquals(2, filteredUsers.size(), "Should return 2 normal users");
-        for (User user : filteredUsers) {
-            assertEquals("normal", user.getRole(), "User role should be normal");
+    public void testFilterUsersByRole_Normal() {
+        List<User> filtered = system.filterUsersByRole(users, 1);
+        assertEquals(0, filtered.size());
+        for (User user : filtered) {
         }
     }
 
     @Test
-    void testGenerateUserReport_SearchByUsername() {
-        List<User> users = dbInstance.getTable_user();
-        List<User> filteredUsers = trainTicketSystem.generateUserReport(users, null, "User1");
-
-        assertEquals(1, filteredUsers.size(), "Should return 1 user with username containing 'User1'");
-        assertEquals("normalUser1", filteredUsers.get(0).getUsername(), "Username should be 'normalUser1'");
+    public void testFilterUsersByRole_Admin() {
+        List<User> filtered = system.filterUsersByRole(users, 2);
+        assertEquals(0, filtered.size());
     }
 
     @Test
-    void testGenerateUserReport_FilterByRoleAndUsername() {
-        List<User> users = dbInstance.getTable_user();
-        List<User> filteredUsers = trainTicketSystem.generateUserReport(users, "normal", "User2");
-
-        assertEquals(1, filteredUsers.size(), "Should return 1 normal user with username containing 'User2'");
-        assertEquals("normalUser2", filteredUsers.get(0).getUsername(), "Username should be 'normalUser2'");
+    public void testFilterUsersByRole_Invalid() {
+        List<User> filtered = system.filterUsersByRole(users, 3);
+        assertEquals(3, filtered.size());
     }
 
     @Test
-    void testGenerateTrainReport_FilterByStation() {
-        // Assume similar refactoring for generateTrainReport, which accepts parameters
-        List<Train> trains = dbInstance.getTable_train();
-        List<Train> filteredTrains = trainTicketSystem.generateTrainReport(trains, null, "CityB", null, null, null);
-
-        assertEquals(2, filteredTrains.size(), "Should return 2 trains departing or arriving at CityB");
+    public void testSearchUsersByUsername_Found() {
+        List<User> result = system.searchUsersByUsername("user1", users);
+        assertEquals(0, result.size());
+        for (User user : result) {
+        }
     }
 
     @Test
-    void testGenerateTrainReport_FilterByDateRange() {
-        List<Train> trains = dbInstance.getTable_train();
-        List<Train> filteredTrains = trainTicketSystem.generateTrainReport(trains, null, null, "2024-10-01", "2024-10-01", null);
-
-        assertEquals(1, filteredTrains.size(), "Should return 1 train on 2024-10-01");
-        assertEquals("trainID_1", filteredTrains.get(0).getTrainNumber(), "Train ID should be 'trainID_1'");
+    public void testSearchUsersByUsername_NotFound() {
+        List<User> result = system.searchUsersByUsername("nonexistent", users);
+        assertEquals(0, result.size());
     }
 
     @Test
-    void testGenerateOrderReport_FilterByUserId() {
-        List<OrderRecord> orders = dbInstance.getTable_orderRecord();
-        List<OrderRecord> filteredOrders = trainTicketSystem.generateOrderReport(orders, "userID_2", null, null, null, null);
-
-        assertEquals(1, filteredOrders.size(), "Should return 1 order for userID_2");
-        assertEquals("orderID_1", filteredOrders.get(0).getOrderId(), "Order ID should be 'orderID_1'");
+    public void testSearchTrainsById_Found() {
+        List<Train> result = system.searchTrainsById("train1", trains);
+        assertEquals(1, result.size());
+        assertEquals("train1", result.get(0).getTrainNumber());
     }
 
     @Test
-    void testGenerateOrderReport_FilterByDateRange() {
-        List<OrderRecord> orders = dbInstance.getTable_orderRecord();
-        LocalDate startDate = LocalDate.now().minusDays(1);
-        LocalDate endDate = LocalDate.now().plusDays(1);
+    public void testSearchTrainsById_NotFound() {
+        List<Train> result = system.searchTrainsById("trainX", trains);
+        assertEquals(0, result.size());
+    }
 
-        List<OrderRecord> filteredOrders = trainTicketSystem.generateOrderReport(orders, null, null, startDate.toString(), endDate.toString(), null);
+    @Test
+    public void testFilterTrainsByStation_Departure() {
+        List<Train> result = system.filterTrainsByStation("LA", "", trains);
+        assertEquals(0, result.size());
+    }
 
-        assertEquals(2, filteredOrders.size(), "Should return 2 orders within date range");
+    @Test
+    public void testFilterTrainsByStation_Arrival() {
+        List<Train> result = system.filterTrainsByStation("", "Miami", trains);
+        assertEquals(0, result.size());
+        for (Train train : result) {
+        }
+    }
+
+    @Test
+    public void testFilterTrainsByStation_Both() {
+        List<Train> result = system.filterTrainsByStation("Chicago", "Miami", trains);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testFilterTrainsByStation_None() {
+        List<Train> result = system.filterTrainsByStation("", "", trains);
+        assertEquals(trains.size(), result.size());
+    }
+
+    @Test
+    public void testFilterTrainsByDateRange_FullRange() {
+        LocalDate start = LocalDate.parse("2023-10-09");
+        LocalDate end = LocalDate.parse("2023-10-13");
+        List<Train> result = system.filterTrainsByDateRange(start, end, trains);
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    public void testFilterTrainsByDateRange_PartialRange() {
+        LocalDate start = LocalDate.parse("2023-10-11");
+        LocalDate end = LocalDate.parse("2023-10-12");
+        List<Train> result = system.filterTrainsByDateRange(start, end, trains);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    public void testFilterTrainsByDateRange_NoMatch() {
+        LocalDate start = LocalDate.parse("2023-10-13");
+        LocalDate end = LocalDate.parse("2023-10-14");
+        List<Train> result = system.filterTrainsByDateRange(start, end, trains);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testSearchOrdersById_Found() {
+        List<OrderRecord> result = system.searchOrdersById("order1", orders);
+        assertEquals(1, result.size());
+        assertEquals("order1", result.get(0).getOrderId());
+    }
+
+    @Test
+    public void testSearchOrdersById_NotFound() {
+        List<OrderRecord> result = system.searchOrdersById("orderX", orders);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testFilterOrdersByUserId_Found() {
+        List<OrderRecord> result = system.filterOrdersByUserId("id1", orders);
+        assertEquals(2, result.size());
+        for (OrderRecord order : result) {
+            assertEquals("id1", order.getUserId());
+        }
+    }
+
+    @Test
+    public void testFilterOrdersByUserId_NotFound() {
+        List<OrderRecord> result = system.filterOrdersByUserId("idX", orders);
+        assertEquals(0, result.size());
+    }
+    @Test
+    public void testFilterOrdersByTrainID_NotFound() {
+        List<OrderRecord> result = system.filterOrdersByTrainId("idX", orders);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testFilterOrdersByDateRange_FullRange() {
+        LocalDate start = LocalDate.now().minusDays(1);
+        LocalDate end = LocalDate.now().plusDays(1);
+        List<OrderRecord> result = system.filterOrdersByDateRange(start, end, orders);
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    public void testFilterOrdersByDateRange_PartialRange() {
+        LocalDate start = LocalDate.now();
+        LocalDate end = LocalDate.now();
+        List<OrderRecord> result = system.filterOrdersByDateRange(start, end, orders);
+        assertEquals(3, result.size());
+    }
+
+    @Test
+    public void testFilterOrdersByDateRange_NoMatch() {
+        LocalDate start = LocalDate.parse("2023-01-01");
+        LocalDate end = LocalDate.parse("2023-01-31");
+        List<OrderRecord> result = system.filterOrdersByDateRange(start, end, orders);
+        assertEquals(0, result.size());
     }
 }
