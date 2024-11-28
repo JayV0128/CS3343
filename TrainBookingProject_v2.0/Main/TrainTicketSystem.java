@@ -40,19 +40,7 @@ public class TrainTicketSystem {
 		return instance;
 	}
 
-	public User getCurrentUser() {
-		return currentUser;
-	}
-
-	public void setCurrentUser(User currentUser) {
-		this.currentUser = currentUser;
-	}
-
-	public User login(Scanner scanner) {
-		System.out.print("Enter username: ");
-		String username = scanner.nextLine();
-		System.out.print("Enter password: ");
-		String password = scanner.nextLine();
+	public User login(String username, String password) {
 
 		User user = userDAO.login(username, password);
 		if (user != null) {
@@ -66,11 +54,8 @@ public class TrainTicketSystem {
 		return user;
 	}
 
-	public boolean register(Scanner scanner) {
-		System.out.print("Registration Form:\nEnter username: ");
-		String username = scanner.nextLine();
-		System.out.print("Enter password: ");
-		String password = scanner.nextLine();
+	public boolean register(String username, String password) {
+
 
 		if (!userDAO.usernameExists(username)) {
 			System.out.println("Register successfully.");
@@ -260,8 +245,9 @@ public class TrainTicketSystem {
 
 		result = totalPrice - (totalPrice * discount);
 		if (currentUser.getCouponList().size() > 0) {
-			result = result - userDAO.useCoupon(result, currentUser);
-			System.out.println("You use a coupon. ");
+			double discout = userDAO.useCoupon(result, currentUser);
+			result = result - discout;
+			System.out.println("You use a coupon. Get discount: " + discout);
 		}
 
 		return result;
@@ -1382,57 +1368,8 @@ public class TrainTicketSystem {
 				.collect(Collectors.toList());
 	}
 
-	// User Mangement
-	public void manageUsers(Scanner scanner) {
-		boolean managing = true;
-		while (managing) {
-			System.out.println("\n--- Manage Users ---");
-			System.out.println("1. List All Users");
-			System.out.println("2. Add New User");
-			System.out.println("3. Remove User");
-			System.out.println("4. Change User Role");
-			System.out.println("5. Return to Admin Menu");
-			System.out.print("Choose an option: ");
-
-			int choice = -1;
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a number between 1 and 5.");
-				scanner.nextLine();
-				continue;
-			}
-
-			switch (choice) {
-				case 1:
-					listAllUsers();
-					break;
-				case 2:
-					addNewUser(scanner);
-					break;
-				case 3:
-					removeUser(scanner);
-					break;
-				case 4:
-					changeUserRole(scanner);
-					break;
-				case 5:
-					managing = false;
-					System.out.println("Returning to Admin Menu.");
-					break;
-				default:
-					System.out.println("Invalid option. Please choose between 1 and 5.");
-			}
-		}
-	}
-
-	private void listAllUsers() {
+	public void listAllUsers() {
 		ArrayList<User> users = userDAO.getUserList();
-		if (users.isEmpty()) {
-			System.out.println("\nNo users found in the system.");
-			return;
-		}
 
 		System.out.println("\n--- Registered Users ---");
 		System.out.printf("%-10s %-20s %-10s\n", "User ID", "Username", "Role");
@@ -1442,60 +1379,23 @@ public class TrainTicketSystem {
 		}
 	}
 
-	private void addNewUser(Scanner scanner) {
-		System.out.println("\n--- Add New User ---");
-
-		System.out.print("Enter Username: ");
-		String username = scanner.nextLine().trim();
-		if (username.isEmpty()) {
-			System.out.println("Username cannot be empty.");
-			return;
-		}
+	public void addNewUser(String username, String password, String role) {
+		
 
 		if (userDAO.usernameExists(username)) {
 			System.out.println("Username already exists. Please choose a different username.");
 			return;
 		}
 
-		System.out.print("Enter Password: ");
-		String password = scanner.nextLine().trim();
-		if (password.isEmpty()) {
-			System.out.println("Password cannot be empty.");
-			return;
-		}
-
-		System.out.println("Select Role:");
-		System.out.println("1. Normal User");
-		System.out.println("2. Administrator");
-		System.out.print("Choose an option: ");
-
-		int roleChoice = -1;
-		try {
-			roleChoice = scanner.nextInt();
-			scanner.nextLine();
-		} catch (InputMismatchException e) {
-			System.out.println("Invalid input. Role set to 'normal user' by default.");
-			scanner.nextLine();
-			roleChoice = 1;
-		}
-
-		String role = "normal";
-		if (roleChoice == 2) {
-			role = "admin";
-		}
 
 		boolean success = userDAO.register(role, username, password);
 		if (success) {
 			System.out.println("User added successfully.");
-		} else {
-			System.out.println("Failed to add user. Please try again.");
-		}
+		} 
 	}
 
-	private void removeUser(Scanner scanner) {
-		System.out.println("\n--- Remove User ---");
-		System.out.print("Enter the User ID or Username to remove: ");
-		String input = scanner.nextLine().trim();
+	public void removeUser(String input) {
+		
 
 		User userToRemove = null;
 		userToRemove = userDAO.getUser_fromUserTable(input);
@@ -1505,33 +1405,14 @@ public class TrainTicketSystem {
 
 		if (userToRemove == null) {
 			System.out.println("User not found.");
-			return;
+			
 		}
 
-		if (userToRemove.getId().equals(currentUser.getId())) {
-			System.out.println("You cannot remove your own account.");
-			return;
-		}
-
-		System.out.print("Are you sure you want to remove user '" + userToRemove.getUsername() + "'? (Y/N): ");
-		String confirmation = scanner.nextLine().trim().toUpperCase();
-		if (!confirmation.equals("Y")) {
-			System.out.println("User removal canceled.");
-			return;
-		}
-
-		boolean success = userDAO.deleteUser_fromUserTable(userToRemove.getId());
-		if (success) {
-			System.out.println("User removed successfully.");
-		} else {
-			System.out.println("Failed to remove user. Please try again.");
-		}
+		return;
 	}
 
-	private void changeUserRole(Scanner scanner) {
-		System.out.println("\n--- Change User Role ---");
-		System.out.print("Enter the User ID or Username to modify: ");
-		String input = scanner.nextLine().trim();
+	public void changeUserRole(String input, int roleChoice) {
+
 
 		User userToModify = null;
 		userToModify = userDAO.getUser_fromUserTable(input);
@@ -1544,50 +1425,36 @@ public class TrainTicketSystem {
 			return;
 		}
 
-		if (userToModify.getId().equals(currentUser.getId())) {
-			System.out.println("You cannot change your own role.");
-			return;
-		}
-
-		System.out.println("Current Role: " + userToModify.getRole());
-		System.out.println("Select New Role:");
-		System.out.println("1. Normal User");
-		System.out.println("2. Administrator");
-		System.out.print("Choose an option: ");
-
-		int roleChoice = -1;
-		try {
-			roleChoice = scanner.nextInt();
-			scanner.nextLine();
-		} catch (InputMismatchException e) {
-			System.out.println("Invalid input. Role not changed.");
-			scanner.nextLine();
-			return;
-		}
-
-		String newRole = userToModify.getRole();
-		if (roleChoice == 1) {
-			newRole = "normal";
-		} else if (roleChoice == 2) {
-			newRole = "admin";
-		} else {
-			System.out.println("Invalid role option. Role not changed.");
-			return;
-		}
-
-		if (newRole.equalsIgnoreCase(userToModify.getRole())) {
-			System.out.println("User already has the role '" + newRole + "'. No changes made.");
-			return;
-		}
-
-		userToModify.setRole(newRole);
-		boolean success = userDAO.updateUser_fromUserTable(userToModify);
-
-		if (success) {
-			System.out.println("User role updated successfully to '" + newRole + "'.");
-		} else {
-			System.out.println("Failed to update user role. Please try again.");
-		}
+//		if (userToModify.getId().equals(currentUser.getId())) {
+//			System.out.println("You cannot change your own role.");
+//			return;
+//		}
+//
+//		
+//
+//		String newRole = userToModify.getRole();
+//		if (roleChoice == 1) {
+//			newRole = "normal";
+//		} else if (roleChoice == 2) {
+//			newRole = "admin";
+//		} else {
+//			System.out.println("Invalid role option. Role not changed.");
+//			return;
+//		}
+//
+//		if (newRole.equalsIgnoreCase(userToModify.getRole())) {
+//			System.out.println("User already has the role '" + newRole + "'. No changes made.");
+//			return;
+//		}
+//
+//		userToModify.setRole(newRole);
+//		boolean success = userDAO.updateUser_fromUserTable(userToModify);
+//
+//		if (success) {
+//			System.out.println("User role updated successfully to '" + newRole + "'.");
+//		} else {
+//			System.out.println("Failed to update user role. Please try again.");
+//		}
 	}
 
 	public void updateAnnouncement(String announcement) {

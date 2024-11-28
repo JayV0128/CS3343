@@ -13,21 +13,31 @@ public class Main {
         // Scenario: current_LoginedUser == null
 
         while (current_LoginedUser == null) {
-            System.out.println("Welcome to Train Ticket System!");
+            System.out.println("Welcome to Train Ticket System!"); 
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.println("3. Exit");
             System.out.print("Please select an option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
-
+ 
             switch (option) {
                 case 1:
-                    current_LoginedUser = train_ticket_system.login(scanner);
+                    
+            		System.out.print("Enter username: ");
+            		String username = scanner.nextLine();
+            		System.out.print("Enter password: ");
+            		String password = scanner.nextLine();
+            		current_LoginedUser = train_ticket_system.login(username, password);
                     break;
 
                 case 2:
-                    train_ticket_system.register(scanner);
+            		System.out.print("Registration Form:\nEnter username: ");
+            		username = scanner.nextLine();
+            		System.out.print("Enter password: ");
+            		password = scanner.nextLine();
+            		
+                    train_ticket_system.register(username, password);
                     break;
 
                 case 3:
@@ -100,7 +110,8 @@ public class Main {
                 System.out.println("5. Add Keyword and Answer");
                 System.out.println("6. Update & publish an announcement");
                 System.out.println("7. Cancel announcement");
-
+                System.out.println("8. Manage User");
+                
                 option = scanner.nextInt();
                 scanner.nextLine();
 
@@ -137,7 +148,102 @@ public class Main {
                         train_ticket_system.updateAnnouncement(null);
                         System.out.println("Announcement cancelled successfully.\n");
                         break;
+                    case 8:
+                        // Cancel an Announcement
+                    	boolean managing = true;
+                		while (managing) {
+                			System.out.println("\n--- Manage Users ---");
+                			System.out.println("1. List All Users");
+                			System.out.println("2. Add New User");
+                			System.out.println("3. Remove User");
+                			System.out.println("4. Change User Role");
+                			System.out.println("5. Return to Admin Menu");
+                			System.out.print("Choose an option: ");
 
+                			int choice = -1;
+                			try {
+                				choice = scanner.nextInt();
+                				scanner.nextLine();
+                			} catch (InputMismatchException e) {
+                				System.out.println("Invalid input. Please enter a number between 1 and 5.");
+                				scanner.nextLine();
+                				continue;
+                			}
+
+                			switch (choice) {
+                				case 1:
+                					train_ticket_system.listAllUsers();
+                					break;
+                				case 2:
+                					System.out.println("\n--- Add New User ---");
+                					System.out.print("Enter Username: ");
+                					String username = scanner.nextLine();
+                					if (username.isEmpty()) {
+                						System.out.println("Username cannot be empty.");
+                						return;
+                					}
+                					System.out.print("Enter Password: ");
+                					String password = scanner.nextLine();
+                					if (password.isEmpty()) {
+                						System.out.println("Password cannot be empty.");
+                						return;
+                					}
+                					System.out.println("Select Role:");
+                					System.out.println("1. Normal User");
+                					System.out.println("2. Administrator");
+                					System.out.print("Choose an option: ");
+                					int roleChoice = -1;
+                					try {
+                						roleChoice = scanner.nextInt();
+                						scanner.nextLine();
+                					} catch (InputMismatchException e) {
+                						System.out.println("Invalid input. Role set to 'normal user' by default.");
+                						scanner.nextLine();
+                						roleChoice = 1;
+                					}		
+                					String role = "normal";
+                					if (roleChoice == 2) {
+                						role = "admin";
+                					}
+                					train_ticket_system.addNewUser(username, password, role);
+                					break;
+                				case 3:
+                					System.out.println("\n--- Remove User ---");
+                					System.out.print("Enter the User ID or Username to remove: ");
+                					String input = scanner.nextLine().trim();
+                					train_ticket_system.removeUser(input);
+                					break;
+                				case 4:
+                					System.out.println("\n--- Change User Role ---");
+                					System.out.print("Enter the User ID or Username to modify: ");
+                					input = scanner.nextLine().trim();
+                					
+                					
+                					System.out.println("Select New Role:");
+                					System.out.println("1. Normal User");
+                					System.out.println("2. Administrator");
+                					System.out.print("Choose an option: ");
+
+                					roleChoice = -1;
+                					try {
+                						roleChoice = scanner.nextInt();
+                						scanner.nextLine();
+                					} catch (InputMismatchException e) {
+                						System.out.println("Invalid input. Role not changed.");
+                						scanner.nextLine();
+                						return;
+                					}
+                					train_ticket_system.changeUserRole(input, roleChoice);
+                					break;
+                				case 5:
+                					managing = false;
+                					System.out.println("Returning to Admin Menu.");
+                					break;
+                				default:
+                					System.out.println("Invalid option. Please choose between 1 and 5.");
+                			}
+                		}
+                        break;
                     default:
                         System.out.println("Invalid option. Please try again.");
                 }

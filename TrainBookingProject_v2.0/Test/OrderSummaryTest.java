@@ -45,7 +45,6 @@ public class OrderSummaryTest {
 		
 		ArrayList<String> expectedResult = new ArrayList<>();
 		expectedResult.add("Miami");
-        
         assertEquals(expectedResult, tts.getMostVisitedDestination(orders));
     }
     

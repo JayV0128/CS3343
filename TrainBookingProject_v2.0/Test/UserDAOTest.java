@@ -35,7 +35,7 @@ class UserDAOTest {
         User user = userDAO.login("testUser", "wrongPass");
         assertNull(user, "User should be null on failed login");
     }
-
+ 
     @Test
     public void testRegisterNewUser() throws Exception{
         boolean isRegistered = userDAO.register("normal", "newUser", "newPass");

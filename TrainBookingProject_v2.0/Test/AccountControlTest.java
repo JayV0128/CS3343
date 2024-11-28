@@ -1,6 +1,7 @@
 package Test;
 
 import junit.framework.TestCase;
+import Main.TrainTicketSystem;
 import org.junit.Test;
 import DAO.UserDAO;
 import DataModel.PlatinumMember;
@@ -12,36 +13,88 @@ public class AccountControlTest extends TestCase{
   
   @Test
   public void testRegisterSucessful() {
-	  UserDAO userDAO = new UserDAO();
-	  boolean result = userDAO.register("normal", "test", "test");
-	  
-	  assertTrue(result);
-
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  boolean result = tts.register("test", "test");
   }
   
   @Test
   public void testRegisterFail() {
-	  UserDAO userDAO = new UserDAO();
-	  boolean result = userDAO.register("normal", "q", "q");
-	  assertFalse(result);
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  boolean result = tts.register("test", "test");
   }
   
   
   @Test
   public void testLoginSucessful() {
-	  UserDAO userDAO = new UserDAO();
-	  String userName = userDAO.login("test", "test").getUsername();
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  String userName = tts.login("test", "test").getUsername();
 	  assertEquals("test", userName);
+	  tts.checkIn();
+	  tts.checkIn();
   }
   
   @Test
   public void testLoginFail() {
-	  UserDAO userDAO = new UserDAO();
+	  TrainTicketSystem tts  = new TrainTicketSystem();
 	  
-	  assertEquals( userDAO.login("test", "test1"), null);
+	  assertEquals( tts.login("test", "test1"), null);
   }
   
+  @Test
+  public void testListUser() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.listAllUsers();
+  }
 
-   
+  @Test
+  public void testAddUserFail() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.addNewUser("test", "test", "normal");
+  }
+  
+  @Test
+  public void testAddUserFail2() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.addNewUser("test", "test", "normal1");
+  }
+
+  @Test
+  public void testAddUserPass() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.addNewUser("k", "k", "normal");
+  }
+  
+  @Test
+  public void testRemoveUserPass() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.removeUser("userID_11");
+  }
+  
+  @Test
+  public void testRemoveUserFail() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.removeUser("p");
+  }
+  @Test
+  public void testRemoveUserFail2() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.login("test", "test");
+	  
+	  tts.removeUser("test");
+  }
+  
+  @Test
+  public void testChangeRoleFail() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.changeUserRole("userID_11", 1);
+  }
+  
+  @Test
+  public void testChangeRolePass() {
+	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  tts.changeUserRole("q", 1);
+  }
+  
+  
   
 }
