@@ -586,7 +586,7 @@ public class TrainTicketSystem {
 
 	// fn to find answer by keyword
 	public String getAnswer(String question) {
-		if (question == null || question.trim().isEmpty()) {
+		if (question.isEmpty()) {
 			return "CSer : Please type your question.";
 		}
 
@@ -612,10 +612,6 @@ public class TrainTicketSystem {
 			}
 		}
 
-		if (keywordCount.isEmpty()) {
-			return "CSer : Your question seems to be new. Please ask via email for further assistance.";
-		}
-
 		CsQuestion maxKey = null;
 		int maxVal = 0;
 		for (CsQuestion key : keywordCount.keySet()) {
@@ -631,7 +627,7 @@ public class TrainTicketSystem {
 			}
 		}
 
-		return "";
+		return "CSer : Your question seems to be new. Please ask via email for further assistance.";
 	}
 
 	// Subscribe and receive messages
