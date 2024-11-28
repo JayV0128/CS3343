@@ -6,9 +6,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import DB_init.Database;
 import DataModel.OrderRecord;
 import DataModel.Train;
 import DataModel.User;
@@ -20,11 +22,12 @@ class ReportTest {
     private List<User> users;
     private List<Train> trains;
     private List<OrderRecord> orders;
+    private Database dbInstance;
 
     @BeforeEach
     void setUp() {
         system = TrainTicketSystem.getInstance();
-
+        dbInstance = Database.getInstance();
 
         users = new ArrayList<>();
         users.add(new User("user1", "password1", "normal", "id1"));
@@ -45,6 +48,11 @@ class ReportTest {
         orders.add(new OrderRecord("order2", "id2", "train2", new java.util.Date(), 200.0, new ArrayList<>()));
         orders.add(new OrderRecord("order3", "id1", "train3", new java.util.Date(), 100.0, new ArrayList<>()));
 
+    }
+    
+    @AfterEach
+    public void tearDown() throws Exception{
+        dbInstance.resetDB();
     }
 
     @Test
