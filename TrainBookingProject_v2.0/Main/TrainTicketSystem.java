@@ -394,71 +394,56 @@ public class TrainTicketSystem {
 		return orderRecord;
     }
 
-	// fn to check tickets (more like check orders)
-	public void viewOrders(Scanner scanner) {
-		while (true) {
-			ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
-			if (userOrders.isEmpty()) {
-				System.out.println("You currently have no orders.");
-				return;
-			}
+//	// fn to check tickets (more like check orders)
+//	public void viewOrders(Scanner scanner) {
+//		while (true) {
+//			ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
+//			if (userOrders.isEmpty()) {
+//				System.out.println("You currently have no orders.");
+//				return;
+//			}
+//
+//			if (!userOrders.isEmpty()) {
+//				summarizeOrders(userOrders);
+//			}
+//			displayOrders(userOrders);
+//
+//			System.out.print("Enter the Order No. to EDIT or CANCEL it, 0 to return to the main menu: ");
+//			int orderNo = scanner.nextInt(); // not to be confused with Order Id
+//
+//			if (orderNo == 0) {
+//				return;
+//			} else if (orderNo > userOrders.size()) {
+//				System.out.println("Invalid option.");
+//			} else {
+//				System.out.println("1. Edit Order");
+//				System.out.println("2. Cancel Order");
+//				System.out.println("3. Return");
+//				System.out.print("Please select an option: ");
+//				int option = scanner.nextInt();
+//				scanner.nextLine();
+//
+//				switch (option) {
+//					case 1:
+//						editTicket(scanner, userOrders.get(orderNo - 1));
+//						break;
+//
+//					case 2:
+//						cancelOrder(scanner, userOrders.get(orderNo - 1));
+//						break;
+//
+//					case 3:
+//						return;
+//
+//					default:
+//						System.out.println("Invalid option. Please try again.");
+//				}
+//			}
+//		}
+//	}
 
-			if (!userOrders.isEmpty()) {
-				summarizeOrders(userOrders);
-			}
-			displayOrders(userOrders);
-
-			System.out.print("Enter the Order No. to EDIT or CANCEL it, 0 to return to the main menu: ");
-			int orderNo = scanner.nextInt(); // not to be confused with Order Id
-
-			if (orderNo == 0) {
-				return;
-			} else if (orderNo > userOrders.size()) {
-				System.out.println("Invalid option.");
-			} else {
-				System.out.println("1. Edit Order");
-				System.out.println("2. Cancel Order");
-				System.out.println("3. Return");
-				System.out.print("Please select an option: ");
-				int option = scanner.nextInt();
-				scanner.nextLine();
-
-				switch (option) {
-					case 1:
-						editTicket(scanner, userOrders.get(orderNo - 1));
-						break;
-
-					case 2:
-						cancelOrder(scanner, userOrders.get(orderNo - 1));
-						break;
-
-					case 3:
-						return;
-
-					default:
-						System.out.println("Invalid option. Please try again.");
-				}
-			}
-		}
-	}
-
-	private int displayOrders(ArrayList<OrderRecord> userOrders) {
-		System.out.println("Your Order Records:");
-		for (int i = 0; i < userOrders.size(); i++) {
-			OrderRecord order = userOrders.get(i);
-			String orderNoAndId = String.format("%s %d: %s %s", "==========", i + 1, order.getOrderId(),
-					"==========");
-			System.out.println(orderNoAndId);
-			System.out.println(order.toString());
-			for (int j = 0; j < orderNoAndId.length(); j++) {
-				System.out.print("=");
-			}
-			System.out.println();
-		}
-		return userOrders.size();
-	}
-
-	private void summarizeOrders(ArrayList<OrderRecord> userOrders) {
+	public void summarizeOrders(User currentUser) {
+		ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
 		double avgRating = calculateAverageRating(userOrders);
 		HashMap<String, Integer> destVisitCount = calculateDestinationVisitCount(userOrders);
 		Map<String, Double> destAvgRating = calculateDestinationAvgRating(userOrders);
@@ -540,69 +525,116 @@ public class TrainTicketSystem {
 
 		return destAvgRating;
 	}
-
-	private void editTicket(Scanner scanner, OrderRecord order) {
-		System.out.println("Current Order Details:");
-		System.out.println(order.toString());
-		System.out.println("You can perform the following actions:");
-		System.out.println("1. Modify Passenger Information");
-		System.out.println("2. Return");
-		System.out.print("Choose an option: ");
-		int editOption = scanner.nextInt();
-		scanner.nextLine();
-
-		switch (editOption) {
-			case 1:
-				// Modify Passenger Information
-				ArrayList<Ticket> tickets = order.getTicketList();
-				for (int i = 0; i < tickets.size(); i++) {
-					Ticket t = tickets.get(i);
-					System.out.printf("Passenger %d: %s, Age: %d\n", i + 1, t.getName(), t.getAge());
-					System.out.print("Do you want to modify this passenger's information? (Y/N): ");
-					String choice = scanner.nextLine();
-					if (choice.equalsIgnoreCase("Y")) {
-						System.out.print("Enter new name: ");
-						String newName = scanner.nextLine();
-						System.out.print("Enter new age: ");
-						int newAge = scanner.nextInt();
-						scanner.nextLine();
-
-						t.setName(newName);
-						t.setAge(newAge);
-					}
-				}
-				System.out.println("Passenger information updated.");
-				break;
-			case 2:
-				return;
-
-			default:
-				System.out.println("Invalid option.");
+	
+	public int displayOrders(User currentUser) {
+		ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
+		System.out.println("Your Order Records:");
+		for (int i = 0; i < userOrders.size(); i++) {
+			OrderRecord order = userOrders.get(i);
+			String orderNoAndId = String.format("%s %d: %s %s", "==========", i + 1, order.getOrderId(),
+					"==========");
+			System.out.println(orderNoAndId);
+			System.out.println(order.toString());
+			for (int j = 0; j < orderNoAndId.length(); j++) {
+				System.out.print("=");
+			}
+			System.out.println();
 		}
-
-		System.out.println("Order has been updated.");
+		return userOrders.size();
 	}
 
-	private void cancelOrder(Scanner scanner, OrderRecord order) {
-		System.out.print("Are you sure you want to cancel this order? (Y/N): ");
-		String confirm = scanner.nextLine();
-		if (!confirm.equalsIgnoreCase("Y")) {
-			System.out.println("Cancel operation aborted.");
-			return;
+//	private void editTicket(Scanner scanner, OrderRecord order) {
+//		System.out.println("Current Order Details:");
+//		System.out.println(order.toString());
+//		System.out.println("You can perform the following actions:");
+//		System.out.println("1. Modify Passenger Information");
+//		System.out.println("2. Return");
+//		System.out.print("Choose an option: ");
+//		int editOption = scanner.nextInt();
+//		scanner.nextLine();
+//
+//		switch (editOption) {
+//			case 1:
+//				// Modify Passenger Information
+//				ArrayList<Ticket> tickets = order.getTicketList();
+//				for (int i = 0; i < tickets.size(); i++) {
+//					Ticket t = tickets.get(i);
+//					System.out.printf("Passenger %d: %s, Age: %d\n", i + 1, t.getName(), t.getAge());
+//					System.out.print("Do you want to modify this passenger's information? (Y/N): ");
+//					String choice = scanner.nextLine();
+//					if (choice.equalsIgnoreCase("Y")) {
+//						System.out.print("Enter new name: ");
+//						String newName = scanner.nextLine();
+//						System.out.print("Enter new age: ");
+//						int newAge = scanner.nextInt();
+//						scanner.nextLine();
+//
+//						t.setName(newName);
+//						t.setAge(newAge);
+//					}
+//				}
+//				System.out.println("Passenger information updated.");
+//				break;
+//			case 2:
+//				return;
+//
+//			default:
+//				System.out.println("Invalid option.");
+//		}
+//
+//		System.out.println("Order has been updated.");
+//	}
+//
+//	private void cancelOrder(Scanner scanner, OrderRecord order) {
+//		System.out.print("Are you sure you want to cancel this order? (Y/N): ");
+//		String confirm = scanner.nextLine();
+//		if (!confirm.equalsIgnoreCase("Y")) {
+//			System.out.println("Cancel operation aborted.");
+//			return;
+//		}
+//
+//		String trainId = order.getTrainId();
+//		Train train = trainDAO.getTrain_fromTrainTable(trainId);
+//		int passengerCount = order.getTicketList().size();
+//		train.setAvailableSeats(train.getAvailableSeats() + passengerCount);
+//		trainDAO.updateTrain_fromTrainTable(train);
+//
+//		boolean deleted = orderRecordDAO.deleteOrderRecord(order.getOrderId());
+//		if (deleted) {
+//			System.out.println("Order has been successfully canceled.");
+//		} else {
+//			System.out.println("Failed to cancel the order.");
+//		}
+//	}
+	
+	public OrderRecord selectOrder(int orderChoice) {
+		if (orderChoice < 1 || orderChoice > trainDAO.getTable_train().size()) {
+			return null;
+		} else {
+			return orderRecordDAO.getTable_orderRecord().get(orderChoice - 1);
 		}
-
+	}
+	
+	public ArrayList<Ticket> getTicketList(OrderRecord order) {
+		return order.getTicketList();
+	}
+	
+	public void printPassengerInfo(Ticket ticket) {
+		System.out.printf("Passenger: %s, Age: %d\n", ticket.getName(), ticket.getAge());
+	}
+	
+	public void modifyPassengerInfo(Ticket ticket, String newName, int newAge) {
+		ticket.setName(newName);
+		ticket.setAge(newAge);
+	}
+	
+	public boolean cancelOrder(OrderRecord order) {
 		String trainId = order.getTrainId();
 		Train train = trainDAO.getTrain_fromTrainTable(trainId);
 		int passengerCount = order.getTicketList().size();
 		train.setAvailableSeats(train.getAvailableSeats() + passengerCount);
 		trainDAO.updateTrain_fromTrainTable(train);
-
-		boolean deleted = orderRecordDAO.deleteOrderRecord(order.getOrderId());
-		if (deleted) {
-			System.out.println("Order has been successfully canceled.");
-		} else {
-			System.out.println("Failed to cancel the order.");
-		}
+		return orderRecordDAO.deleteOrderRecord(order.getOrderId());
 	}
 
 	// fn to find answer by keyword

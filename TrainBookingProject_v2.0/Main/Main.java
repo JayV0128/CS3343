@@ -80,7 +80,7 @@ public class Main {
                         break;
 
                     case 2:
-                        train_ticket_system.viewOrders(scanner);
+                        viewOrders(train_ticket_system, current_LoginedUser, scanner);
                         break;
 
                     // CS function
@@ -724,5 +724,108 @@ public class Main {
 		OrderRecord orderRecord = tts.createOrder(currentUser, selectedTrain.getTrainNumber(), totalPrice, order_ticketList);
 
 		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
+	}
+    
+	private static void viewOrders(TrainTicketSystem tts, User currentUser, Scanner scanner) {
+		while (true) {
+			if (!tts.hasOrders(currentUser)) {
+				System.out.println("You currently have no orders.");
+				return;
+			}
+
+			if (tts.hasOrders(currentUser)) {
+				tts.summarizeOrders(currentUser);
+			}
+			tts.displayOrders(currentUser);
+
+			System.out.print("Enter the Order No. to EDIT or CANCEL it, 0 to return to the main menu: ");
+			int orderNo = scanner.nextInt(); // not to be confused with Order Id
+			OrderRecord selectedOrder = tts.selectOrder(orderNo);
+			
+			if (selectedOrder == null) {
+				System.out.println("Invalid train selection.");
+				return;
+			} else if (orderNo == 0) {
+				return;
+			} else {
+				System.out.println("1. Edit Order");
+				System.out.println("2. Cancel Order");
+				System.out.println("3. Return");
+				System.out.print("Please select an option: ");
+				int option = scanner.nextInt();
+				scanner.nextLine();
+
+				switch (option) {
+				case 1:
+					editTicket(tts, scanner, selectedOrder);
+					break;
+
+				case 2:
+					cancelOrder(tts, scanner, selectedOrder);
+					break;
+
+				case 3:
+					return;
+
+				default:
+					System.out.println("Invalid option. Please try again.");
+				}
+			}
+		}
+	}
+	
+	private static void editTicket(TrainTicketSystem tts, Scanner scanner, OrderRecord order) {
+		System.out.println("Current Order Details:");
+		System.out.println(order.toString());
+		System.out.println("You can perform the following actions:");
+		System.out.println("1. Modify Passenger Information");
+		System.out.println("2. Return");
+		System.out.print("Choose an option: ");
+		int editOption = scanner.nextInt();
+		scanner.nextLine();
+
+		switch (editOption) {
+			case 1:
+				// Modify Passenger Information
+				ArrayList<Ticket> ticketList = tts.getTicketList(order);
+				for (int i = 0; i < ticketList.size(); i++) {
+					tts.printPassengerInfo(ticketList.get(i));
+					System.out.print("Do you want to modify this passenger's information? (Y/N): ");
+					String choice = scanner.nextLine();
+					if (choice.equalsIgnoreCase("Y")) {
+						System.out.print("Enter new name: ");
+						String newName = scanner.nextLine();
+						System.out.print("Enter new age: ");
+						int newAge = scanner.nextInt();
+						scanner.nextLine();
+
+						tts.modifyPassengerInfo(ticketList.get(i), newName, newAge);
+					}
+				}
+				System.out.println("Passenger information updated.");
+				break;
+			case 2:
+				return;
+
+			default:
+				System.out.println("Invalid option.");
+		}
+
+		System.out.println("Order has been updated.");
+	}
+
+	private static void cancelOrder(TrainTicketSystem tts,Scanner scanner, OrderRecord order) {
+		System.out.print("Are you sure you want to cancel this order? (Y/N): ");
+		String confirm = scanner.nextLine();
+		if (!confirm.equalsIgnoreCase("Y")) {
+			System.out.println("Cancel operation aborted.");
+			return;
+		}
+
+		if (tts.cancelOrder(order)) {
+			System.out.println("Order has been successfully canceled.");
+		} else {
+			System.out.println("Failed to cancel the order.");
+		}
 	}
 }

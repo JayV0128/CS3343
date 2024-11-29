@@ -175,6 +175,7 @@ public class RecommendationTest {
 	@AfterEach
     public void tearDown() throws Exception {
         dbInstance.getTable_orderRecord().clear();
+        dbInstance.resetDB();
     }
   
 }

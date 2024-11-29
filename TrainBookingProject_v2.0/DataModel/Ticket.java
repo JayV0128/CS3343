@@ -3,6 +3,9 @@ package DataModel;
 public class Ticket {
     private String name;
     private int age;
+    
+	public Ticket() {
+	}
 
     public Ticket(String name, int age) {
         this.name = name;
