@@ -300,24 +300,23 @@ public class TrainTicketSystem {
 			return new ArrayList<>();
 		} else {
 			// Check for available trains
-	        for (OrderRecord orderRecord : orderRecordList) {
-	            Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
-	            if (train.getStatus().equals("active") && train.getAvailableSeats() > 0) {
-	                filteredOrderRecordList.add(orderRecord);
-	            }
-	        }
-			
+		        for (OrderRecord orderRecord : orderRecordList) {
+		            Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+		            if (train.getStatus().equals("active") && train.getAvailableSeats() > 0) {
+		                filteredOrderRecordList.add(orderRecord);
+		            }
+		        }
+				
 			if (!location.equals("None")) {
 				// Filter out orders that do not match the location
-	            filteredOrderRecordList.removeIf(orderRecord -> {
-	                Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
-	                return !(train.getDeparture().equals(location) || train.getArrival().equals(location));
-	            });
+		    		filteredOrderRecordList.removeIf(orderRecord -> {
+					Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+					return !(train.getDeparture().equals(location) || train.getArrival().equals(location));
+				});
 			} else {
 				filteredOrderRecordList = orderRecordList;
 			}
-			
-			
+				
 			Map<String, Integer> trainRating = new HashMap<>();
 			for (OrderRecord orderRecord : filteredOrderRecordList) {
 				String trainId = orderRecord.getTrainId();
@@ -331,12 +330,12 @@ public class TrainTicketSystem {
 					trainRating.put(trainId, 0);
 				}
 			}
-
+	
 			List<String> sortedTrainIds = trainRating.entrySet().stream()
 					.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 					.map(Map.Entry::getKey)
 					.toList();
-
+	
 			int endIndex = Math.min(3, sortedTrainIds.size());
 			ArrayList<String> recommendedTrainIds = new ArrayList<>(sortedTrainIds.subList(0, endIndex));
 			System.out.println(recommendedTrainIds.toString());
