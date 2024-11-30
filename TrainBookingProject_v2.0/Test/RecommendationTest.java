@@ -19,6 +19,11 @@ public class RecommendationTest {
 	
 	private Database database = Database.getInstance();
 	
+	@BeforeEach
+	public void setup() {
+		Database.getInstance().resetDB();
+	}
+	
 	@Test
 	public void testRecommendTrains_1() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
@@ -28,7 +33,7 @@ public class RecommendationTest {
 	
 	@Test
 	public void testRecommendTrains_2() {
-		TrainTicketSystem tts = new TrainTicketSystem();
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
 
 		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 24, 100));
 		

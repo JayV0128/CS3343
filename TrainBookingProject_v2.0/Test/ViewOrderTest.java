@@ -14,16 +14,10 @@ import DataModel.User;
 import Main.TrainTicketSystem;
 
 public class ViewOrderTest {
-	private Database dbInstance;
-	
-    @BeforeEach
-    public void setUp() {
-        dbInstance = Database.getInstance();
-    }
-    
-	@AfterEach
-	public void tearDown() throws Exception {
-		dbInstance.resetDB();
+	@BeforeEach
+	public void setup() {
+		Database.getInstance().resetDB();
+//		TrainTicketSystem.getInstance().clearCurrentUser();
 	}
 	
 	@Test
@@ -111,5 +105,63 @@ public class ViewOrderTest {
 
         assertTrue(tts.cancelOrder(order));
 	}
+	
+	@Test
+	public void testGetFinishedOrders_01() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		UserDAO userDao = new UserDAO();
+		User user = userDao.getUserByName("q");
+		tts.login("q", "q");
+		
+		OrderRecord order1 = tts.createOrder(user, "trainID_1", 10, new ArrayList<Ticket>());
+		OrderRecord order2 = tts.createOrder(user, "trainID_2", 20, new ArrayList<Ticket>());
+		
+		ArrayList<OrderRecord> finishedOrders = new ArrayList<>();
+		finishedOrders.add(order1);
+		finishedOrders.add(order2);
 
+		assertEquals(finishedOrders, tts.getFinishedOrders());
+	}
+	
+	@Test
+	public void testRateOrder_01() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		UserDAO userDao = new UserDAO();
+
+		User user = userDao.getUserByName("q");
+		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
+		ticketList.add(new Ticket());
+		ticketList.add(new Ticket());
+		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+
+		assertTrue(tts.rateOrder(order, 3));
+	}
+
+	@Test
+	public void testRateOrder_02() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		UserDAO userDao = new UserDAO();
+
+		User user = userDao.getUserByName("q");
+		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
+		ticketList.add(new Ticket());
+		ticketList.add(new Ticket());
+		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+
+		assertFalse(tts.rateOrder(order, 0));
+	}
+	
+	@Test
+	public void testRateOrder_03() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		UserDAO userDao = new UserDAO();
+
+		User user = userDao.getUserByName("q");
+		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
+		ticketList.add(new Ticket());
+		ticketList.add(new Ticket());
+		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+
+		assertFalse(tts.rateOrder(order, 6));
+	}
 }

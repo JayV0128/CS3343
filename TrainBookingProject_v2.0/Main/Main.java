@@ -61,7 +61,7 @@ public class Main {
                 }
 
                 // display finished orders
-                train_ticket_system.displayFinishedOrders(current_LoginedUser.getId(), scanner);
+                displayFinishedOrders(train_ticket_system, scanner);
 
                 System.out.println();
                 System.out.println("1. Book Tickets");
@@ -630,6 +630,37 @@ public class Main {
 		String trainIdSearch = scanner.nextLine().trim().toLowerCase();
 
 		return trainTicketSystem.searchTrainsById(trainIdSearch, trains);
+	}
+    
+	// fn to display finished orders
+	private static void displayFinishedOrders(TrainTicketSystem tts, Scanner scanner) {
+		ArrayList<OrderRecord> finishedOrders = tts.getFinishedOrders();
+		if (finishedOrders.size() == 0) {
+			System.out.println("\nNo finished orders.");
+		} else {
+			System.out.println("\n===============================================");
+			System.out.println("Finished Orders:");
+			for (int i = 0; i < finishedOrders.size(); i++) {
+				OrderRecord finishedOrder = finishedOrders.get(i);
+				Train train = tts.getTrain(finishedOrder.getTrainId());
+
+				// print finishedOrder details
+				System.out.println((i + 1) + ": " + finishedOrder.getOrderId());
+				System.out.println("\nTrain Number: " + train.getTrainNumber());
+				System.out.println("Journey: " + "from " + train.getDeparture() + " to " + train.getArrival());
+				System.out.println("Date: " + train.getDate() + ", " + train.getTime());
+				System.out.println("Price: " + train.getPrice());
+
+				System.out.print("\nPlease rate this order: (1-5, 5 is the best): ");
+				int rating = scanner.nextInt();
+				
+				while (tts.rateOrder(finishedOrder, rating) == false) {
+					System.out.print("Invalid rating. Please enter a number between 1 and 5: ");
+					rating = scanner.nextInt();
+				}
+			}
+			System.out.println("\n===============================================");
+		}
 	}
     
     private static void bookTickets(TrainTicketSystem tts, User currentUser, Scanner scanner) {

@@ -23,7 +23,7 @@ public class TrainTicketSystem {
 	private User currentUser;
 	private MessageCenter messageCenter;
 
-	public TrainTicketSystem() {
+	private TrainTicketSystem() {
 		userDAO = new UserDAO();
 		trainDAO = new TrainDAO();
 		seatPlanDAO = new SeatDAO();
@@ -39,6 +39,10 @@ public class TrainTicketSystem {
 		}
 		return instance;
 	}
+	
+//	public void resetInstance() {
+//		T
+//	}
 
 	public User login(String username, String password) {
 
@@ -67,37 +71,37 @@ public class TrainTicketSystem {
 		return userDAO.register("normal", username, password);
 	}
 
-	// fn to display finished orders
-	public void displayFinishedOrders(String id, Scanner scanner) {
-		ArrayList<OrderRecord> finishedOrders = getFinishedOrders(id);
-		if (finishedOrders.size() == 0) {
-			System.out.println("\nNo finished orders.");
-		} else {
-			System.out.println("\n===============================================");
-			System.out.println("Finished Orders:");
-			for (int i = 0; i < finishedOrders.size(); i++) {
-				OrderRecord finishedOrder = finishedOrders.get(i);
-				Train train = trainDAO.getTrain_fromTrainTable(finishedOrder.getTrainId());
-
-				// print finishedOrder details
-				System.out.println((i + 1) + ": " + finishedOrder.getOrderId());
-				System.out.println("\nTrain Number: " + train.getTrainNumber());
-				System.out.println("Journey: " + "from " + train.getDeparture() + " to " + train.getArrival());
-				System.out.println("Date: " + train.getDate() + ", " + train.getTime());
-				System.out.println("Price: " + train.getPrice());
-
-				System.out.print("\nPlease rate this order: (1-5, 5 is the best): ");
-				int rating = scanner.nextInt();
-				finishedOrder.setRating(rating);
-			}
-			System.out.println("\n===============================================");
-		}
-	}
+//	// fn to display finished orders
+//	public void displayFinishedOrders(String id, Scanner scanner) {
+//		ArrayList<OrderRecord> finishedOrders = getFinishedOrders(id);
+//		if (finishedOrders.size() == 0) {
+//			System.out.println("\nNo finished orders.");
+//		} else {
+//			System.out.println("\n===============================================");
+//			System.out.println("Finished Orders:");
+//			for (int i = 0; i < finishedOrders.size(); i++) {
+//				OrderRecord finishedOrder = finishedOrders.get(i);
+//				Train train = trainDAO.getTrain_fromTrainTable(finishedOrder.getTrainId());
+//
+//				// print finishedOrder details
+//				System.out.println((i + 1) + ": " + finishedOrder.getOrderId());
+//				System.out.println("\nTrain Number: " + train.getTrainNumber());
+//				System.out.println("Journey: " + "from " + train.getDeparture() + " to " + train.getArrival());
+//				System.out.println("Date: " + train.getDate() + ", " + train.getTime());
+//				System.out.println("Price: " + train.getPrice());
+//
+//				System.out.print("\nPlease rate this order: (1-5, 5 is the best): ");
+//				int rating = scanner.nextInt();
+//				finishedOrder.setRating(rating);
+//			}
+//			System.out.println("\n===============================================");
+//		}
+//	}
 
 	// fn to get finished orders
-	public ArrayList<OrderRecord> getFinishedOrders(String id) {
+	public ArrayList<OrderRecord> getFinishedOrders() {
 		ArrayList<OrderRecord> finishedOrders = new ArrayList<OrderRecord>();
-		ArrayList<OrderRecord> orderRecordList = orderRecordDAO.getOrdersByUserId(id);
+		ArrayList<OrderRecord> orderRecordList = orderRecordDAO.getOrdersByUserId(currentUser.getId());
 
 		for (int i = 0; i < orderRecordList.size(); i++) {
 			OrderRecord orderRecord = orderRecordList.get(i);
@@ -109,6 +113,19 @@ public class TrainTicketSystem {
 			}
 		}
 		return finishedOrders;
+	}
+	
+	public Train getTrain(String trainID) {
+		return trainDAO.getTrain_fromTrainTable(trainID);
+	}
+	
+	public boolean rateOrder(OrderRecord order, int rating) {
+		if (rating < 1 || rating > 5) {
+			return false;
+		} else {
+			order.setRating(rating);
+			return orderRecordDAO.updateOrderRecord(order);
+		}
 	}
 
 	// fn to order tickets

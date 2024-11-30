@@ -14,21 +14,21 @@ public class AccountControlTest {
   
   @Test
   public void testRegisterSucessful() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  boolean result = tts.register("123", "123");
 	  tts.displayUserList();
   }
   
   @Test
   public void testRegisterFail() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  boolean result = tts.register("test", "test");
   }
   
   
   @Test
   public void testLoginSucessful() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  String userName = tts.login("test", "test").getUsername();
 	  assertEquals("test", userName);
 	  tts.checkIn();
@@ -37,49 +37,49 @@ public class AccountControlTest {
   
   @Test
   public void testLoginFail() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  
 	  assertEquals( tts.login("test", "test1"), null);
   }
   
   @Test
   public void testListUser() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.listAllUsers();
   }
 
   @Test
   public void testAddUserFail() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.addNewUser("test", "test", "normal");
   }
   
   @Test
   public void testAddUserFail2() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.addNewUser("test", "test", "normal1");
   }
 
   @Test
   public void testAddUserPass() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.addNewUser("k", "k", "normal");
   }
   
   @Test
   public void testRemoveUserPass() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.removeUser("userID_11");
   }
   
   @Test
   public void testRemoveUserFail() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.removeUser("p");
   }
   @Test
   public void testRemoveUserFail2() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.login("test", "test");
 	  
 	  tts.removeUser("test");
@@ -87,13 +87,13 @@ public class AccountControlTest {
   
   @Test
   public void testChangeRoleFail() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.changeUserRole("userID_11", 1);
   }
   
   @Test
   public void testChangeRolePass() {
-	  TrainTicketSystem tts  = new TrainTicketSystem();
+	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.changeUserRole("q", 1);
   }
   

@@ -18,7 +18,7 @@ class Observer_announcementTest {
     @Test
     // Test case 1: User login, no announcement received
     public void Observer_announcementTest_1() {
-        TrainTicketSystem ticketSystem = new TrainTicketSystem();
+        TrainTicketSystem ticketSystem = TrainTicketSystem.getInstance();
         UserDAO userDAO = new UserDAO();
         User user = userDAO.login("q", "q"); // user: q
         boolean isReceovedMsg = user.isReceivedAnnouncement();
@@ -31,7 +31,7 @@ class Observer_announcementTest {
     @Test
     // Test case 2: User login, Subscribe announcement, receive announcement
     public void Observer_announcementTest_2() {
-        TrainTicketSystem ticketSystem = new TrainTicketSystem();
+        TrainTicketSystem ticketSystem = TrainTicketSystem.getInstance();
         UserDAO userDAO = new UserDAO();
         User user = userDAO.login("q", "q"); // user: q
         

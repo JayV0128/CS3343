@@ -11,7 +11,7 @@ public class HandleCuponTest {
   
   @Test
   public void testGenerateCoupon() {
-	  TrainTicketSystem ticketSystem = new TrainTicketSystem();
+	  TrainTicketSystem ticketSystem = TrainTicketSystem.getInstance();
 	  UserDAO userDAO = new UserDAO();
 	  
 		for (int i = 0; i < 100; i++) {
@@ -25,7 +25,7 @@ public class HandleCuponTest {
   
   @Test
 	public void testUseCoupon() {
-		TrainTicketSystem ticketSystem = new TrainTicketSystem();
+		TrainTicketSystem ticketSystem = TrainTicketSystem.getInstance();
 		UserDAO userDAO = new UserDAO();
 		
 		int i = 0;
