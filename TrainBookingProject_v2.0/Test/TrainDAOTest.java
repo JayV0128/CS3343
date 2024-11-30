@@ -1,7 +1,8 @@
 package Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import DataModel.*;
 import DB_init.Database;
 import DAO.*;

@@ -1,15 +1,16 @@
 package Test;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import Main.TrainTicketSystem;
-import org.junit.Test;
 import DAO.UserDAO;
 import DataModel.PlatinumMember;
 import DataModel.User;
 
 
 
-public class AccountControlTest extends TestCase{
+public class AccountControlTest {
   
   @Test
   public void testRegisterSucessful() {

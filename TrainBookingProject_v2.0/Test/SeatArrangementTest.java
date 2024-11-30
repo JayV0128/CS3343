@@ -1,13 +1,11 @@
 package Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.io.*;
-
-import org.junit.jupiter.api.Test;
 
 import Main.*;
 import DAO.*;

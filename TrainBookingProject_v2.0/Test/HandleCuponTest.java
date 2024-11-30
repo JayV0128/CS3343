@@ -1,13 +1,13 @@
 package Test;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import DAO.UserDAO;
 import Main.TrainTicketSystem;
 
 
-
-public class HandleCuponTest extends TestCase{
+public class HandleCuponTest {
   
   @Test
   public void testGenerateCoupon() {

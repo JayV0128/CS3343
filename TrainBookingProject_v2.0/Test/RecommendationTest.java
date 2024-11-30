@@ -1,10 +1,11 @@
 package Test;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 
 import java.util.Date;
-
-import org.junit.Test;
 
 import DB_init.Database;
 import DataModel.OrderRecord;
@@ -13,7 +14,6 @@ import DataModel.Train;
 
 import Main.TrainTicketSystem;
 
-import static org.junit.Assert.*;
 
 public class RecommendationTest {
 	
