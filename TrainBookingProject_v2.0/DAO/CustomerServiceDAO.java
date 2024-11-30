@@ -11,14 +11,6 @@ public class CustomerServiceDAO {
     public ArrayList<CsQuestion> getTable_question() {
         return Database.getInstance().getTable_question();
     }
-
-    public boolean addQA(CsQuestion question) {
-        if(Database.getInstance().getTable_question().add(question)){
-            return true;
-        }else{
-            return false;
-        }
-    }
     
     public boolean addQA(ArrayList<String> keywords, String answer) {
             CsQuestion question = new CsQuestion(keywords, answer);
