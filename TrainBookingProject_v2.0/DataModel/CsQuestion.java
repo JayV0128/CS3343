@@ -13,16 +13,8 @@ public class CsQuestion {
         return questionList;
     }
 
-    public void setQuestion(String question) {
-        questionList.add(question);
-    }
-
     public String getAnswer() {
         return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
     }
 
 }
