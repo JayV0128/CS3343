@@ -15,11 +15,8 @@ public class CustomerServiceDAO {
         return question_table;
     }
 
-    public boolean addQA(CsQuestion question) {
-        if(question_table.add(question)){
-            return true;
-        }else{
-            return false;
-        }
+    public boolean addQA(ArrayList<String> keywords, String answer) {
+            CsQuestion question = new CsQuestion(keywords, answer);
+            return question_table.add(question);
     }
 }

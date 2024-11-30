@@ -976,7 +976,7 @@ public class TrainTicketSystem {
 				}
 			}
 		}
-		if (customerServiceDAO.addQA(new CsQuestion(new ArrayList<>(keywordSet), answer))) {
+		if (customerServiceDAO.addQA(new ArrayList<>(keywordSet), answer)) {
 			return "QA added successfully.";
 		} else {
 			return null;
