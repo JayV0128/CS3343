@@ -4,21 +4,17 @@ import java.util.*;
 import DB_init.*;
 import DataModel.*;
 
-public class TrainDAO {
-
-    private ArrayList<Train> table_train;
-    
+public class TrainDAO { 
     public TrainDAO() {
-        table_train = Database.getInstance().getTable_train();
     }
     
     public ArrayList<Train> getTable_train() {
-        return table_train;
+        return Database.getInstance().getTable_train();
     }
     
     public Train getTrain_fromTrainTable(String trainNumber) {
         Train targetTrain = null;
-        for (Train train : table_train) {
+        for (Train train : Database.getInstance().getTable_train()) {
             if (train.getTrainNumber().equals(trainNumber)) {
                 targetTrain = train;
             }
@@ -28,7 +24,7 @@ public class TrainDAO {
     }
     
     public boolean addTrain_fromTrainTable(Train train) {
-        table_train.add(train);
+        Database.getInstance().getTable_train().add(train);
         return true;
     }
     
@@ -55,7 +51,7 @@ public class TrainDAO {
         Train foundTrain = getTrain_fromTrainTable(trainNumber);
         
         if(foundTrain != null) {
-            table_train.remove(foundTrain);
+            Database.getInstance().getTable_train().remove(foundTrain);
             result = true;
         }
         return result;

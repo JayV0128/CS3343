@@ -5,19 +5,16 @@ import DB_init.*;
 import DataModel.*;
 
 public class SeatDAO {
-    private ArrayList<seatPlan> table_seatPlan;
-    
     public SeatDAO() {
-        table_seatPlan = Database.getInstance().getTable_seattingPlan();
     }
 
-    public ArrayList<seatPlan> getTable_seatPlan() {
-        return table_seatPlan;
+    public ArrayList<seatPlan> getTable_seattingPlan(){
+        return Database.getInstance().getTable_seattingPlan();
     }
 
     public seatPlan getSeatPlan_ByTrainID(String trainNumber) {
         seatPlan targetSeatPlan = null;
-        for (seatPlan seatPlan : table_seatPlan) {
+        for (seatPlan seatPlan : Database.getInstance().getTable_seattingPlan()) {
             if (seatPlan.getTrainID().equals(trainNumber)) {
                 targetSeatPlan = seatPlan;
             }

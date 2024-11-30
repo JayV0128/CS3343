@@ -6,17 +6,14 @@ import DB_init.Database;
 import DataModel.*;
 
 public class UserDAO {
-
-	private ArrayList<User> table_user;
 	// private User nowUser;
 
 	public UserDAO() {
-		table_user = Database.getInstance().getTable_user();
 	}
 
 	public User login(String userName, String pwd) {
 		User currentUser = null;
-		for (User user : table_user) {
+		for (User user : Database.getInstance().getTable_user()) {
 			if (user.getUsername().equals(userName) && user.getPassword().equals(pwd)) {
 				// this.nowUser = user;
 				currentUser = user;
@@ -41,7 +38,7 @@ public class UserDAO {
 	// }
 
 	// public double getDiscount(String Id) {
-	// for (User user : table_user) {
+	// for (User user : Database.getInstance().getTable_user()) {
 	// if (user.getUsername().equals(Id)) {
 	// return user.getMember().getDiscount();
 	// }
@@ -54,27 +51,27 @@ public class UserDAO {
 		if (usernameExists(userName)) {
 			return false;
 		}
-		addUser_fromUserTable(new User("normal", "userID_" + (table_user.size() + 1), userName, pwd));
+		addUser_fromUserTable(new User("normal", "userID_" + (Database.getInstance().getTable_user().size() + 1), userName, pwd));
 		return true;
 	}
 
 	public ArrayList<User> getUserList() {
-		return table_user;
+		return Database.getInstance().getTable_user();
 	}
 
 	public void printUserList() {
-		for (int i = 0; i < table_user.size(); i++) {
-			System.out.println("index: " + i + " " + table_user.get(i).toString());
+		for (int i = 0; i < Database.getInstance().getTable_user().size(); i++) {
+			System.out.println("index: " + i + " " + Database.getInstance().getTable_user().get(i).toString());
 		}
 	}
 
 	public boolean addUser_fromUserTable(User user) {
-		table_user.add(user);
+		Database.getInstance().getTable_user().add(user);
 		return true;
 	}
 
 	public User getUser_fromUserTable(String Id) {
-		for (User user : table_user) {
+		for (User user : Database.getInstance().getTable_user()) {
 			if (user.getId().equals(Id)) {
 				return user;
 			}
@@ -100,14 +97,14 @@ public class UserDAO {
 		User foundUser = getUser_fromUserTable(userId);
 
 		if (foundUser != null) {
-			table_user.remove(foundUser);
+			Database.getInstance().getTable_user().remove(foundUser);
 			result = true;
 		}
 		return result;
 	}
 
 	public boolean usernameExists(String username) {
-		for (User user : table_user) {
+		for (User user : Database.getInstance().getTable_user()) {
 			if (user.getUsername().equalsIgnoreCase(username)) {
 				return true;
 			}
@@ -116,7 +113,7 @@ public class UserDAO {
 	}
 
 	public User getUserByUsername(String username) {
-		for (User user : table_user) {
+		for (User user : Database.getInstance().getTable_user()) {
 			if (user.getUsername().equals(username)) {
 				return user;
 			}

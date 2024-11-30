@@ -5,18 +5,15 @@ import DB_init.*;
 import DataModel.*;
 
 public class CustomerServiceDAO {
-    private ArrayList<CsQuestion> question_table;
-    
     public CustomerServiceDAO() {
-        question_table = Database.getInstance().getTable_question();
     }
 
     public ArrayList<CsQuestion> getTable_question() {
-        return question_table;
+        return Database.getInstance().getTable_question();
     }
 
     public boolean addQA(CsQuestion question) {
-        if(question_table.add(question)){
+        if(Database.getInstance().getTable_question().add(question)){
             return true;
         }else{
             return false;
