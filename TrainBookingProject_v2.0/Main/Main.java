@@ -80,7 +80,7 @@ public class Main {
                         break;
 
                     case 2:
-                        viewOrders(train_ticket_system, current_LoginedUser, scanner);
+                        viewOrders(train_ticket_system, scanner);
                         break;
 
                     // CS function
@@ -664,7 +664,7 @@ public class Main {
 	}
     
     private static void bookTickets(TrainTicketSystem tts, User currentUser, Scanner scanner) {
-		if (tts.hasOrders(currentUser)) {
+		if (tts.hasOrders()) {
 			System.out.print("\nDo you need any recommendations? (Y/N) ");
 			String preferences = scanner.nextLine();
 
@@ -752,22 +752,22 @@ public class Main {
 		// Ticket Info:
 		// ...
 
-		OrderRecord orderRecord = tts.createOrder(currentUser, selectedTrain.getTrainNumber(), totalPrice, order_ticketList);
+		OrderRecord orderRecord = tts.createOrder(selectedTrain.getTrainNumber(), totalPrice, order_ticketList);
 
 		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
 	}
     
-	private static void viewOrders(TrainTicketSystem tts, User currentUser, Scanner scanner) {
+	private static void viewOrders(TrainTicketSystem tts, Scanner scanner) {
 		while (true) {
-			if (!tts.hasOrders(currentUser)) {
+			if (!tts.hasOrders()) {
 				System.out.println("You currently have no orders.");
 				return;
 			}
 
-			if (tts.hasOrders(currentUser)) {
-				tts.summarizeOrders(currentUser);
+			if (tts.hasOrders()) {
+				summarizeOrders(tts);
 			}
-			tts.displayOrders(currentUser);
+			tts.displayOrders();
 
 			System.out.print("Enter the Order No. to EDIT or CANCEL it, 0 to return to the main menu: ");
 			int orderNo = scanner.nextInt(); // not to be confused with Order Id
@@ -805,6 +805,17 @@ public class Main {
 		}
 	}
 	
+	private static void summarizeOrders(TrainTicketSystem tts) {
+		// Output summary
+		System.out.printf("Summary of your orders:\n");
+		System.out.printf("Average rating of your orders: %.2f\n", tts.calculateAverageRating());
+		System.out.printf("Your most visited destination(s) (%d times each): %s\n", Collections.max(tts.calculateDestinationVisitCount().values()),
+				String.join(", ", tts.getMostVisitedDestination()));
+		System.out.printf("Your highest rated destination(s) (Average of %.2f rating each): %s\n\n", Collections.max(tts.calculateDestinationAvgRating().values()),
+				String.join(", ", tts.getMaxAvgRatingDestination()));
+	}
+
+	
 	private static void editTicket(TrainTicketSystem tts, Scanner scanner, OrderRecord order) {
 		System.out.println("Current Order Details:");
 		System.out.println(order.toString());
@@ -820,7 +831,8 @@ public class Main {
 				// Modify Passenger Information
 				ArrayList<Ticket> ticketList = tts.getTicketList(order);
 				for (int i = 0; i < ticketList.size(); i++) {
-					tts.printPassengerInfo(ticketList.get(i));
+					Ticket ticket = ticketList.get(i);
+					System.out.printf("Passenger: %s, Age: %d\n", ticket.getName(), ticket.getAge());
 					System.out.print("Do you want to modify this passenger's information? (Y/N): ");
 					String choice = scanner.nextLine();
 					if (choice.equalsIgnoreCase("Y")) {
@@ -830,7 +842,7 @@ public class Main {
 						int newAge = scanner.nextInt();
 						scanner.nextLine();
 
-						tts.modifyPassengerInfo(ticketList.get(i), newName, newAge);
+						tts.modifyPassengerInfo(ticket, newName, newAge);
 					}
 				}
 				System.out.println("Passenger information updated.");

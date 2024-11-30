@@ -17,19 +17,24 @@ import DataModel.User;
 import Main.TrainTicketSystem;
 
 public class BookTicketTest {
+	@BeforeEach
+	public void setUp() {
+		Database.getInstance().resetDB();
+	}
+	
 	@Test
 	public void testHasOrders_01() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		User user = new User("normal", "test", "user1", "password");
-		assertFalse(tts.hasOrders(user));
+		tts.login("q", "q");
+		assertFalse(tts.hasOrders());
 	}
 	
 	@Test
 	public void testHasOrders_02() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		User user = new User("normal", "test", "user1", "password");
-		tts.createOrder(user, "trainID_1", 100, null);
-		assertTrue(tts.hasOrders(user));
+		tts.login("q", "q");
+		tts.createOrder("trainID_1", 100, null);
+		assertTrue(tts.hasOrders());
 	}
 
 	@Test

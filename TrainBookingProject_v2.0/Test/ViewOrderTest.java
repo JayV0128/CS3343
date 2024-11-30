@@ -17,21 +17,20 @@ public class ViewOrderTest {
 	@BeforeEach
 	public void setup() {
 		Database.getInstance().resetDB();
-//		TrainTicketSystem.getInstance().clearCurrentUser();
+
 	}
 	
 	@Test
 	public void testDisplayOrders() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
+		tts.login("q", "q");
 		
-		User user = userDao.getUserByName("q");
 		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 		ticketList.add(new Ticket());
 		ticketList.add(new Ticket());
-        OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+        tts.createOrder("trainID_1", 0, ticketList);
         
-        assertEquals(1, tts.displayOrders(user));
+        assertEquals(1, tts.displayOrders());
 	}
 	
 	@Test
@@ -46,7 +45,7 @@ public class ViewOrderTest {
 		orderRecordDAO.addOrderRecord(order2);
 		orderRecordDAO.addOrderRecord(order3);
 		
-		assertTrue(true);
+		assertEquals(order2, tts.selectOrder(2));
 	}
 	
 	@Test
@@ -95,13 +94,12 @@ public class ViewOrderTest {
 	@Test
 	public void testCancelOrder() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
+		tts.login("q", "q");
 		
-		User user = userDao.getUserByName("q");
 		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 		ticketList.add(new Ticket());
 		ticketList.add(new Ticket());
-        OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+        OrderRecord order = tts.createOrder("trainID_1", 0, ticketList);
 
         assertTrue(tts.cancelOrder(order));
 	}
@@ -109,12 +107,10 @@ public class ViewOrderTest {
 	@Test
 	public void testGetFinishedOrders_01() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
-		User user = userDao.getUserByName("q");
 		tts.login("q", "q");
 		
-		OrderRecord order1 = tts.createOrder(user, "trainID_1", 10, new ArrayList<Ticket>());
-		OrderRecord order2 = tts.createOrder(user, "trainID_2", 20, new ArrayList<Ticket>());
+		OrderRecord order1 = tts.createOrder("trainID_1", 10, new ArrayList<Ticket>());
+		OrderRecord order2 = tts.createOrder("trainID_2", 20, new ArrayList<Ticket>());
 		
 		ArrayList<OrderRecord> finishedOrders = new ArrayList<>();
 		finishedOrders.add(order1);
@@ -126,13 +122,12 @@ public class ViewOrderTest {
 	@Test
 	public void testRateOrder_01() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
-
-		User user = userDao.getUserByName("q");
+		tts.login("q", "q");
+		
 		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 		ticketList.add(new Ticket());
 		ticketList.add(new Ticket());
-		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+		OrderRecord order = tts.createOrder("trainID_1", 0, ticketList);
 
 		assertTrue(tts.rateOrder(order, 3));
 	}
@@ -140,13 +135,12 @@ public class ViewOrderTest {
 	@Test
 	public void testRateOrder_02() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
-
-		User user = userDao.getUserByName("q");
+		tts.login("q", "q");
+		
 		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 		ticketList.add(new Ticket());
 		ticketList.add(new Ticket());
-		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+		OrderRecord order = tts.createOrder("trainID_1", 0, ticketList);
 
 		assertFalse(tts.rateOrder(order, 0));
 	}
@@ -154,14 +148,19 @@ public class ViewOrderTest {
 	@Test
 	public void testRateOrder_03() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
-		UserDAO userDao = new UserDAO();
-
-		User user = userDao.getUserByName("q");
+		tts.login("q", "q");
+		
 		ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 		ticketList.add(new Ticket());
 		ticketList.add(new Ticket());
-		OrderRecord order = tts.createOrder(user, "trainID_1", 0, ticketList);
+		OrderRecord order = tts.createOrder("trainID_1", 0, ticketList);
 
 		assertFalse(tts.rateOrder(order, 6));
+	}
+	
+	@Test
+	public void testGetTrain() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		assertNotNull(tts.getTrain("trainID_1"));
 	}
 }
