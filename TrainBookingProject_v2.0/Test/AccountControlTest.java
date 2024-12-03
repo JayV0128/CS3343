@@ -1,6 +1,7 @@
 package Test;
 
 import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import Main.TrainTicketSystem;
@@ -17,12 +18,14 @@ public class AccountControlTest {
 	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  boolean result = tts.register("123", "123");
 	  tts.displayUserList();
+	  assertEquals(true, result);
   }
   
   @Test
   public void testRegisterFail() {
 	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  boolean result = tts.register("test", "test");
+	  assertEquals(false, result);
   }
   
   
@@ -33,6 +36,7 @@ public class AccountControlTest {
 	  assertEquals("test", userName);
 	  tts.checkIn();
 	  tts.checkIn();
+	  
   }
   
   @Test
@@ -52,6 +56,7 @@ public class AccountControlTest {
   public void testAddUserFail() {
 	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
 	  tts.addNewUser("test", "test", "normal");
+	  
   }
   
   @Test
@@ -97,6 +102,6 @@ public class AccountControlTest {
 	  tts.changeUserRole("q", 1);
   }
   
-  
+
   
 }
