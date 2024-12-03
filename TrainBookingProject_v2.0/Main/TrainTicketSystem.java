@@ -744,11 +744,9 @@ public class TrainTicketSystem {
 				}
 			}
 		}
-		if (customerServiceDAO.addQA(new ArrayList<>(keywordSet), answer)) {
-			return "QA added successfully.";
-		} else {
-			return null;
-		}
+		customerServiceDAO.addQA(new ArrayList<>(keywordSet), answer);
+		return "QA added successfully.";
+		
 	}
 
 	// Report methods for admin
