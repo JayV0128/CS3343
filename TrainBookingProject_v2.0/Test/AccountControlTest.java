@@ -1,107 +1,77 @@
 package Test;
 
 import org.junit.jupiter.api.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-import Main.TrainTicketSystem;
-import DAO.UserDAO;
-import DataModel.PlatinumMember;
-import DataModel.User;
+import DataModel.*;
+import DB_init.Database;
+import DAO.*;
+import java.util.ArrayList;
 
+class AccountControlTest {
 
+    private UserDAO userDAO;
+    private User testUser;
+    private Database dbInstance;
 
-public class AccountControlTest {
-  
-  @Test
-  public void testRegisterSucessful() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  boolean result = tts.register("123", "123");
-	  tts.displayUserList();
-	  assertEquals(true, result);
-  }
-  
-  @Test
-  public void testRegisterFail() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  boolean result = tts.register("test", "test");
-	  assertEquals(false, result);
-  }
-  
-  
-  @Test
-  public void testLoginSucessful() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  String userName = tts.login("test", "test").getUsername();
-	  assertEquals("test", userName);
-	  tts.checkIn();
-	  tts.checkIn();
-	  
-  }
-  
-  @Test
-  public void testLoginFail() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  
-	  assertEquals( tts.login("test", "test1"), null);
-  }
-  
-  @Test
-  public void testListUser() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.listAllUsers();
-  }
+    @BeforeEach
+    public void setUp() {
+        dbInstance = Database.getInstance();
+        userDAO = new UserDAO();
+        // Clear and initialize the user table
+        dbInstance.getTable_user().clear();
+        testUser = new User("normal", "userID_1", "testUser", "testPass");
+        userDAO.addUser_fromUserTable(testUser);
+    }
 
-  @Test
-  public void testAddUserFail() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.addNewUser("test", "test", "normal");
-	  
-  }
-  
-  @Test
-  public void testAddUserFail2() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.addNewUser("test", "test", "normal1");
-  }
+    @Test
+    public void testLoginSuccess() throws Exception{
+        User user = userDAO.login("testUser", "testPass");
+        assertNotNull(user, "User should not be null on successful login");
+        assertEquals("testUser", user.getUsername(), "Usernames should match");
+    }
 
-  @Test
-  public void testAddUserPass() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.addNewUser("k", "k", "normal");
-  }
-  
-  @Test
-  public void testRemoveUserPass() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.removeUser("userID_11");
-  }
-  
-  @Test
-  public void testRemoveUserFail() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.removeUser("p");
-  }
-  @Test
-  public void testRemoveUserFail2() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.login("test", "test");
-	  
-	  tts.removeUser("test");
-  }
-  
-  @Test
-  public void testChangeRoleFail() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.changeUserRole("userID_11", 1);
-  }
-  
-  @Test
-  public void testChangeRolePass() {
-	  TrainTicketSystem tts  = TrainTicketSystem.getInstance();
-	  tts.changeUserRole("q", 1);
-  }
-  
+    @Test
+    public void testLoginFailure()throws Exception {
+        User user = userDAO.login("testUser", "wrongPass");
+        assertNull(user, "User should be null on failed login");
+    }
+ 
+    @Test
+    public void testRegisterNewUser() throws Exception{
+        boolean isRegistered = userDAO.register("normal", "newUser", "newPass");
+        assertTrue(isRegistered, "Registration should succeed for new username");
+        User newUser = userDAO.getUserByName("newUser");
+        assertNotNull(newUser, "Newly registered user should exist");
+    }
 
-  
+    @Test
+    public void testRegisterExistingUser() throws Exception{
+        boolean isRegistered = userDAO.register("normal", "testUser", "testPass");
+        assertFalse(isRegistered, "Registration should fail for existing username");
+    }
+
+    @Test
+    public void testDeleteUser() throws Exception{
+        boolean isDeleted = userDAO.deleteUser_fromUserTable("userID_1");
+        assertTrue(isDeleted, "User should be successfully deleted");
+        User deletedUser = userDAO.getUserByName("testUser");
+        assertNull(deletedUser, "Deleted user should not exist");
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception{
+        testUser.setPassword("newPass");
+        boolean isUpdated = userDAO.updateUser_fromUserTable(testUser);
+        assertTrue(isUpdated, "User should be successfully updated");
+        User updatedUser = userDAO.getUserByName("testUser");
+        assertEquals("newPass", updatedUser.getPassword(), "Password should be updated");
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception{
+        // Reset the database
+        dbInstance.getTable_user().clear();
+        dbInstance.resetDB();
+    }
 }
