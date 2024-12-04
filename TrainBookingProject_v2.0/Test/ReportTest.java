@@ -56,8 +56,7 @@ class ReportTest {
     public void testFilterUsersByRole_Normal() {
         List<User> filtered = system.filterUsersByRole(users, 1);
         assertEquals(0, filtered.size());
-        for (User user : filtered) {
-        }
+    
     }
 
     @Test
@@ -76,8 +75,7 @@ class ReportTest {
     public void testSearchUsersByUsername_Found() {
         List<User> result = system.searchUsersByUsername("user1", users);
         assertEquals(0, result.size());
-        for (User user : result) {
-        }
+       
     }
 
     @Test
@@ -109,8 +107,7 @@ class ReportTest {
     public void testFilterTrainsByStation_Arrival() {
         List<Train> result = system.filterTrainsByStation("", "Miami", trains);
         assertEquals(0, result.size());
-        for (Train train : result) {
-        }
+       
     }
 
     @Test
