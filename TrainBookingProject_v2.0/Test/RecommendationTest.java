@@ -68,7 +68,7 @@ public class RecommendationTest {
 		database.getTable_orderRecord().add(or3);
 		
 		ArrayList<String> result = tts.recommendTrains("userID_2", "None");
-//		assertEquals("[trainID_3, trainID_2, trainID_1]", result.toString());
+		assertEquals("[trainID_3, trainID_2, trainID_1]", result.toString());
 	}	
 	
 	@Test
@@ -97,7 +97,7 @@ public class RecommendationTest {
 		database.getTable_orderRecord().add(or4);
 		
 		ArrayList<String> result = tts.recommendTrains("userID_2", "None");
-//		assertEquals("[trainID_1, trainID_3, trainID_2]", result.toString());
+		assertEquals("[trainID_1, trainID_3, trainID_2]", result.toString());
 	}	
 	
 	@Test
