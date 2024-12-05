@@ -4,8 +4,10 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import DataModel.*;
+import Main.TrainTicketSystem;
 import DB_init.Database;
 import DAO.*;
+
 import java.util.ArrayList;
 
 class AccountControlTest {
@@ -26,29 +28,26 @@ class AccountControlTest {
 
     @Test
     public void testLoginSuccess() throws Exception{
-        User user = userDAO.login("testUser", "testPass");
-        assertNotNull(user, "User should not be null on successful login");
-        assertEquals("testUser", user.getUsername(), "Usernames should match");
+        TrainTicketSystem tts = TrainTicketSystem.getInstance();
+        assertEquals(testUser, tts.login("testUser", "testPass"));
     }
 
     @Test
     public void testLoginFailure()throws Exception {
-        User user = userDAO.login("testUser", "wrongPass");
-        assertNull(user, "User should be null on failed login");
+        TrainTicketSystem tts = TrainTicketSystem.getInstance();
+        assertNull(tts.login("testUser", "wrongPass"));
     }
  
     @Test
     public void testRegisterNewUser() throws Exception{
-        boolean isRegistered = userDAO.register("normal", "newUser", "newPass");
-        assertTrue(isRegistered, "Registration should succeed for new username");
-        User newUser = userDAO.getUserByName("newUser");
-        assertNotNull(newUser, "Newly registered user should exist");
+        TrainTicketSystem tts = TrainTicketSystem.getInstance();
+        assertTrue(tts.register("newUser", "newPass"));
     }
 
     @Test
     public void testRegisterExistingUser() throws Exception{
-        boolean isRegistered = userDAO.register("normal", "testUser", "testPass");
-        assertFalse(isRegistered, "Registration should fail for existing username");
+        TrainTicketSystem tts = TrainTicketSystem.getInstance();
+        assertFalse(tts.register("testUser", "testPass"));
     }
 
     @Test
