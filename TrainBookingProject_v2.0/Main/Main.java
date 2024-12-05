@@ -115,7 +115,6 @@ public class Main {
                 System.out.println("5. Add Keyword and Answer");
                 System.out.println("6. Update & publish an announcement");
                 System.out.println("7. Cancel announcement");
-                System.out.println("8. Manage User");
                 
                 option = scanner.nextInt();
                 scanner.nextLine();
