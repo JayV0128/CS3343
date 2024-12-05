@@ -130,7 +130,7 @@ public class Main {
                         break;
                     case 3:
                         System.out.println("Display User List");
-                        train_ticket_system.displayUserList();
+                        train_ticket_system.listAllUsers();
                         break;
                     case 4:
                         // Logout

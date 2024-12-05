@@ -834,15 +834,15 @@ public class TrainTicketSystem {
 				})
 				.collect(Collectors.toList());
 	}
-//	public void listAllUsers() {
-//		ArrayList<User> users = userDAO.getUserList();
-//		System.out.println("\n--- Registered Users ---");
-//		System.out.printf("%-10s %-20s %-10s\n", "User ID", "Username", "Role");
-//		System.out.println("-------------------------------------------------");
-//		for (User user : users) {
-//			System.out.printf("%-10s %-20s %-10s\n", user.getId(), user.getUsername(), user.getRole());
-//		}
-//	}
+	public void listAllUsers() {
+		ArrayList<User> users = userDAO.getUserList();
+		System.out.println("\n--- Registered Users ---");
+		System.out.printf("%-10s %-20s %-10s\n", "User ID", "Username", "Role");
+		System.out.println("-------------------------------------------------");
+		for (User user : users) {
+			System.out.printf("%-10s %-20s %-10s\n", user.getId(), user.getUsername(), user.getRole());
+		}
+	}
 
 	public void updateAnnouncement(String announcement) {
 		messageCenter.updateAnnouncement(announcement);
@@ -851,11 +851,4 @@ public class TrainTicketSystem {
 	public void notifyAllUsers() {
 		messageCenter.notifyObservers();
 	}
-
-	public void displayUserList() {
-		userDAO.printUserList();
-	}
-
-	
-
 }
