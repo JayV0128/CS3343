@@ -21,7 +21,7 @@ public class RecommendationTest {
 	
 	@BeforeEach
 	public void setup() {
-		Database.getInstance().resetDB();
+		database.resetDB();
 	}
 	
 	@Test
@@ -113,8 +113,11 @@ public class RecommendationTest {
 		OrderRecord or2 = new OrderRecord("orderID_userID_2_1", "userID_2", "trainID_2", new Date(), 1, new ArrayList<Ticket>());
 		or2.setRating(2);
 		
+		database.getTable_orderRecord().add(or1);
+		database.getTable_orderRecord().add(or2);
+		
 		ArrayList<String> result = tts.recommendTrains("userID_2", "LA");
-//		assertEquals("[trainID_1]", result.toString());
+		assertEquals("[trainID_1]", result.toString());
 	}
 	
 //	@AfterEach
