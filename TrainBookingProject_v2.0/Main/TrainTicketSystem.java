@@ -147,31 +147,31 @@ public class TrainTicketSystem {
 		return result;
 	}
 
-	// recommend train according to user's order history
-	public void displayRecommendations(String id, String location) {
-		ArrayList<String> recommendedTrainIds = recommendTrains(id, location);
-		ArrayList<Train> availableTrains = new ArrayList<>();
-
-		for (int i = 0; i < recommendedTrainIds.size(); i++) {
-			Train train = trainDAO.getTrain_fromTrainTable(recommendedTrainIds.get(i));
-			availableTrains.add(train);
-		}
-
-		System.out.println(
-				"\n=============================================================================================================");
-		System.out.println("Top 3 Train Recommendations:");
-
-		if (availableTrains.size() == 0) {
-			System.out.println("No recommendations available.");
-		} else {
-			for (int i = 0; i < availableTrains.size(); i++) {
-				System.out.println(availableTrains.get(i).toString());
-			}
-		}
-
-		System.out.println(
-				"\n=============================================================================================================");
-	}
+//	// recommend train according to user's order history
+//	public void displayRecommendations(String id, String location) {
+//		ArrayList<String> recommendedTrainIds = recommendTrains(id, location);
+//		ArrayList<Train> availableTrains = new ArrayList<>();
+//
+//		for (int i = 0; i < recommendedTrainIds.size(); i++) {
+//			Train train = trainDAO.getTrain_fromTrainTable(recommendedTrainIds.get(i));
+//			availableTrains.add(train);
+//		}
+//
+//		System.out.println(
+//				"\n=============================================================================================================");
+//		System.out.println("Top 3 Train Recommendations:");
+//
+//		if (availableTrains.size() == 0) {
+//			System.out.println("No recommendations available.");
+//		} else {
+//			for (int i = 0; i < availableTrains.size(); i++) {
+//				System.out.println(availableTrains.get(i).toString());
+//			}
+//		}
+//
+//		System.out.println(
+//				"\n=============================================================================================================");
+//	}
 
 	// fn to provide recommendations
 	public ArrayList<String> recommendTrains(String id, String location) {

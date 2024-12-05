@@ -672,7 +672,7 @@ public class Main {
 						"\nPlease enter the location that you might want to depart or arrive [LA, Washington DC, Miami, Chicago, None]: ");
 				String location = scanner.nextLine();
 
-				tts.displayRecommendations(currentUser.getId(), location);
+				displayRecommendations(tts, currentUser.getId(), location);
 			}
 		}
 
@@ -754,6 +754,31 @@ public class Main {
 		OrderRecord orderRecord = tts.createOrder(selectedTrain.getTrainNumber(), totalPrice, order_ticketList);
 
 		System.out.println("Order successful. Order ID: " + orderRecord.getOrderId());
+	}
+    
+	private static void displayRecommendations(TrainTicketSystem tts, String id, String location) {
+		ArrayList<String> recommendedTrainIds = tts.recommendTrains(id, location);
+		ArrayList<Train> availableTrains = new ArrayList<>();
+
+		for (int i = 0; i < recommendedTrainIds.size(); i++) {
+			Train train = tts.getTrain(recommendedTrainIds.get(i));
+			availableTrains.add(train);
+		}
+
+		System.out.println(
+				"\n=============================================================================================================");
+		System.out.println("Top 3 Train Recommendations:");
+
+		if (availableTrains.size() == 0) {
+			System.out.println("No recommendations available.");
+		} else {
+			for (int i = 0; i < availableTrains.size(); i++) {
+				System.out.println(availableTrains.get(i).toString());
+			}
+		}
+
+		System.out.println(
+				"\n=============================================================================================================");
 	}
     
 	private static void viewOrders(TrainTicketSystem tts, Scanner scanner) {
