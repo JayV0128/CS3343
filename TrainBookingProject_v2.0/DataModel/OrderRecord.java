@@ -32,9 +32,9 @@ public class OrderRecord {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
+//    public void setOrderId(String orderId) {
+//        this.orderId = orderId;
+//    }
 
     public String getUserId() {
         return userId;
@@ -56,25 +56,18 @@ public class OrderRecord {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
-        this.orderDate = orderDate;
-    }
+//    public void setOrderDate(Date orderDate) {
+//        this.orderDate = orderDate;
+//    }
 
     public double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
+//    public void setAmount(double amount) {
+//        this.amount = amount;
+//    }
 
-    // public ArrayList<Passenger> getPassengerList() {
-    //     return passengerList;
-    // }
-
-    // public void setPassengerList(ArrayList<Passenger> passengerList) {
-    //     this.passengerList = passengerList;
-    // }
 
     public ArrayList<Ticket> getTicketList() {
         return ticketList;

@@ -95,7 +95,8 @@ public class TrainTicketSystem {
 			return false;
 		} else {
 			order.setRating(rating);
-			return orderRecordDAO.updateOrderRecord(order);
+			orderRecordDAO.updateOrderRecord(order);
+			return true;
 		}
 	}
 	
@@ -402,13 +403,14 @@ public class TrainTicketSystem {
 		ticket.setAge(newAge);
 	}
 	
-	public boolean cancelOrder(OrderRecord order) {
+	public String cancelOrder(OrderRecord order) {
 		String trainId = order.getTrainId();
 		Train train = trainDAO.getTrain_fromTrainTable(trainId);
 		int passengerCount = order.getTicketList().size();
 		train.setAvailableSeats(train.getAvailableSeats() + passengerCount);
 		trainDAO.updateTrain_fromTrainTable(train);
-		return orderRecordDAO.deleteOrderRecord(order.getOrderId());
+		orderRecordDAO.deleteOrderRecord(order);
+		return "Order has been successfully canceled.";
 	}
 
 	// fn to find answer by keyword

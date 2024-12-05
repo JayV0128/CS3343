@@ -101,7 +101,7 @@ public class ViewOrderTest {
 		ticketList.add(new Ticket());
         OrderRecord order = tts.createOrder("trainID_1", 0, ticketList);
 
-        assertTrue(tts.cancelOrder(order));
+        assertEquals("Order has been successfully canceled.", tts.cancelOrder(order));
 	}
 	
 	@Test

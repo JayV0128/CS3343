@@ -889,10 +889,6 @@ public class Main {
 			return;
 		}
 
-		if (tts.cancelOrder(order)) {
-			System.out.println("Order has been successfully canceled.");
-		} else {
-			System.out.println("Failed to cancel the order.");
-		}
+		System.out.println(tts.cancelOrder(order));
 	}
 }
