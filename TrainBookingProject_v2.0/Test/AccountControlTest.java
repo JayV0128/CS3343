@@ -29,6 +29,9 @@ class AccountControlTest {
     @Test
     public void testLoginSuccess() throws Exception{
         TrainTicketSystem tts = TrainTicketSystem.getInstance();
+        tts.login("testUser", "testPass");
+        tts.checkIn();
+        tts.checkIn();
         assertEquals(testUser, tts.login("testUser", "testPass"));
     }
 
@@ -52,6 +55,8 @@ class AccountControlTest {
 
     @Test
     public void testDeleteUser() throws Exception{
+    	TrainTicketSystem tts = TrainTicketSystem.getInstance();
+    	tts.listAllUsers();
         boolean isDeleted = userDAO.deleteUser_fromUserTable("userID_1");
         assertTrue(isDeleted, "User should be successfully deleted");
         User deletedUser = userDAO.getUserByName("testUser");
