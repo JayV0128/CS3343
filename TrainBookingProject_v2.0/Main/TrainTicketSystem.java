@@ -39,7 +39,6 @@ public class TrainTicketSystem {
 		}
 		return instance;
 	}
-	
 
 	public User login(String username, String password) {
 
@@ -85,11 +84,11 @@ public class TrainTicketSystem {
 		}
 		return finishedOrders;
 	}
-	
+
 	public Train getTrain(String trainID) {
 		return trainDAO.getTrain_fromTrainTable(trainID);
 	}
-	
+
 	public boolean rateOrder(OrderRecord order, int rating) {
 		if (rating < 1 || rating > 5) {
 			return false;
@@ -99,11 +98,11 @@ public class TrainTicketSystem {
 			return true;
 		}
 	}
-	
+
 	public boolean hasOrders() {
 		return orderRecordDAO.getOrdersByUserId(currentUser.getId()).size() > 0;
 	}
-	
+
 	public Train selectTrain(int trainChoice) {
 		if (trainChoice < 1 || trainChoice > trainDAO.getTable_train().size()) {
 			return null;
@@ -148,31 +147,31 @@ public class TrainTicketSystem {
 		return result;
 	}
 
-//	// recommend train according to user's order history
-//	public void displayRecommendations(String id, String location) {
-//		ArrayList<String> recommendedTrainIds = recommendTrains(id, location);
-//		ArrayList<Train> availableTrains = new ArrayList<>();
-//
-//		for (int i = 0; i < recommendedTrainIds.size(); i++) {
-//			Train train = trainDAO.getTrain_fromTrainTable(recommendedTrainIds.get(i));
-//			availableTrains.add(train);
-//		}
-//
-//		System.out.println(
-//				"\n=============================================================================================================");
-//		System.out.println("Top 3 Train Recommendations:");
-//
-//		if (availableTrains.size() == 0) {
-//			System.out.println("No recommendations available.");
-//		} else {
-//			for (int i = 0; i < availableTrains.size(); i++) {
-//				System.out.println(availableTrains.get(i).toString());
-//			}
-//		}
-//
-//		System.out.println(
-//				"\n=============================================================================================================");
-//	}
+	// // recommend train according to user's order history
+	// public void displayRecommendations(String id, String location) {
+	// ArrayList<String> recommendedTrainIds = recommendTrains(id, location);
+	// ArrayList<Train> availableTrains = new ArrayList<>();
+	//
+	// for (int i = 0; i < recommendedTrainIds.size(); i++) {
+	// Train train = trainDAO.getTrain_fromTrainTable(recommendedTrainIds.get(i));
+	// availableTrains.add(train);
+	// }
+	//
+	// System.out.println(
+	// "\n=============================================================================================================");
+	// System.out.println("Top 3 Train Recommendations:");
+	//
+	// if (availableTrains.size() == 0) {
+	// System.out.println("No recommendations available.");
+	// } else {
+	// for (int i = 0; i < availableTrains.size(); i++) {
+	// System.out.println(availableTrains.get(i).toString());
+	// }
+	// }
+	//
+	// System.out.println(
+	// "\n=============================================================================================================");
+	// }
 
 	// fn to provide recommendations
 	public ArrayList<String> recommendTrains(String id, String location) {
@@ -183,29 +182,27 @@ public class TrainTicketSystem {
 			return new ArrayList<>();
 		} else {
 			// Check for available trains
-		        for (OrderRecord orderRecord : orderRecordList) {
-		            Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
-		            if (train.getStatus().equals("active") && train.getAvailableSeats() > 0) {
-		                filteredOrderRecordList.add(orderRecord);
-		            }
-		        }
-				
+			for (OrderRecord orderRecord : orderRecordList) {
+				Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+				if (train.getStatus().equals("active") && train.getAvailableSeats() > 0) {
+					filteredOrderRecordList.add(orderRecord);
+				}
+			}
+
 			if (!location.equals("None")) {
 				// Filter out orders that do not match the location
-		    		filteredOrderRecordList.removeIf(orderRecord -> {
+				filteredOrderRecordList.removeIf(orderRecord -> {
 					Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
 					return !(train.getDeparture().equals(location) || train.getArrival().equals(location));
 				});
 			} else {
 				filteredOrderRecordList = orderRecordList;
 			}
-				
+
 			Map<String, Integer> trainRating = new HashMap<>();
 			for (OrderRecord orderRecord : filteredOrderRecordList) {
 				String trainId = orderRecord.getTrainId();
-				
-				
-				
+
 				int rating = orderRecord.getRating();
 				if (rating > 0) {
 					trainRating.put(trainId, rating);
@@ -213,16 +210,16 @@ public class TrainTicketSystem {
 					trainRating.put(trainId, 0);
 				}
 			}
-	
+
 			List<String> sortedTrainIds = trainRating.entrySet().stream()
 					.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 					.map(Map.Entry::getKey)
 					.toList();
-	
+
 			int endIndex = Math.min(3, sortedTrainIds.size());
 			ArrayList<String> recommendedTrainIds = new ArrayList<>(sortedTrainIds.subList(0, endIndex));
 			System.out.println(recommendedTrainIds.toString());
-			
+
 			return recommendedTrainIds;
 		}
 	}
@@ -272,35 +269,41 @@ public class TrainTicketSystem {
 		return result;
 
 	}
-	
+
 	public OrderRecord createOrder(String trainID, double totalPrice, ArrayList<Ticket> ticketList) {
 		OrderRecord orderRecord = new OrderRecord(
 				String.format("orderID_%s_%s", currentUser.getId(),
 						orderRecordDAO.getOrdersByUserId(currentUser.getId()).size()),
-				currentUser.getId(), trainID, new Date(), getTotalPriceWithDiscount(currentUser, totalPrice), ticketList);
+				currentUser.getId(), trainID, new Date(), getTotalPriceWithDiscount(currentUser, totalPrice),
+				ticketList);
 		orderRecordDAO.addOrderRecord(orderRecord);
 		return orderRecord;
-    }
+	}
 
-//	public void summarizeOrders(User currentUser) {
-//		ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
-//		double avgRating = calculateAverageRating(userOrders);
-//		HashMap<String, Integer> destVisitCount = calculateDestinationVisitCount(userOrders);
-//		Map<String, Double> destAvgRating = calculateDestinationAvgRating(userOrders);
-//
-//		// Find most visited destinations
-//		int maxVisitCount = Collections.max(destVisitCount.values());
-//		// Find highest rated destinations
-//		double maxAvgRating = Collections.max(destAvgRating.values()); 
-//
-//		// Output summary
-//		System.out.printf("Summary of your orders:\n");
-//		System.out.printf("Average rating of your orders: %.2f\n", avgRating);
-//		System.out.printf("Your most visited destination(s) (%d times each): %s\n", maxVisitCount,
-//				String.join(", ", getMostVisitedDestination(userOrders)));
-//		System.out.printf("Your highest rated destination(s) (Average of %.2f rating each): %s\n\n", maxAvgRating,
-//				String.join(", ", getMaxAvgRatingDestination(userOrders)));
-//	}
+	// public void summarizeOrders(User currentUser) {
+	// ArrayList<OrderRecord> userOrders =
+	// orderRecordDAO.getOrdersByUserId(currentUser.getId());
+	// double avgRating = calculateAverageRating(userOrders);
+	// HashMap<String, Integer> destVisitCount =
+	// calculateDestinationVisitCount(userOrders);
+	// Map<String, Double> destAvgRating =
+	// calculateDestinationAvgRating(userOrders);
+	//
+	// // Find most visited destinations
+	// int maxVisitCount = Collections.max(destVisitCount.values());
+	// // Find highest rated destinations
+	// double maxAvgRating = Collections.max(destAvgRating.values());
+	//
+	// // Output summary
+	// System.out.printf("Summary of your orders:\n");
+	// System.out.printf("Average rating of your orders: %.2f\n", avgRating);
+	// System.out.printf("Your most visited destination(s) (%d times each): %s\n",
+	// maxVisitCount,
+	// String.join(", ", getMostVisitedDestination(userOrders)));
+	// System.out.printf("Your highest rated destination(s) (Average of %.2f rating
+	// each): %s\n\n", maxAvgRating,
+	// String.join(", ", getMaxAvgRatingDestination(userOrders)));
+	// }
 
 	public double calculateAverageRating() {
 		ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
@@ -368,7 +371,7 @@ public class TrainTicketSystem {
 
 		return destAvgRating;
 	}
-	
+
 	public int displayOrders() {
 		ArrayList<OrderRecord> userOrders = orderRecordDAO.getOrdersByUserId(currentUser.getId());
 		System.out.println("Your Order Records:");
@@ -385,7 +388,7 @@ public class TrainTicketSystem {
 		}
 		return userOrders.size();
 	}
-	
+
 	public OrderRecord selectOrder(int orderChoice) {
 		if (orderChoice < 1 || orderChoice > trainDAO.getTable_train().size()) {
 			return null;
@@ -393,16 +396,16 @@ public class TrainTicketSystem {
 			return orderRecordDAO.getTable_orderRecord().get(orderChoice - 1);
 		}
 	}
-	
+
 	public ArrayList<Ticket> getTicketList(OrderRecord order) {
 		return order.getTicketList();
 	}
-	
+
 	public void modifyPassengerInfo(Ticket ticket, String newName, int newAge) {
 		ticket.setName(newName);
 		ticket.setAge(newAge);
 	}
-	
+
 	public String cancelOrder(OrderRecord order) {
 		String trainId = order.getTrainId();
 		Train train = trainDAO.getTrain_fromTrainTable(trainId);
@@ -598,6 +601,7 @@ public class TrainTicketSystem {
 				returnVal.add("true");
 				returnVal.add("Overlap time slot detected, new time slot: " + time);
 			}
+			return returnVal;
 		}
 		int totalSeats = 24;
 		Train newTrain = new Train(trainID, departure, arrival, date, time, totalSeats, price);
@@ -749,30 +753,29 @@ public class TrainTicketSystem {
 		}
 		customerServiceDAO.addQA(new ArrayList<>(keywordSet), answer);
 		return "QA added successfully.";
-		
+
 	}
 
 	// Report methods for admin
 
-
 	public List<User> filterUsersByRole(List<User> users, int roleChoice) {
-        final String role;
-        switch (roleChoice) {
-            case 1:
-                role = "normal";
-                break;
-            case 2:
-                role = "admin";
-                break;
-            default:
-                System.out.println("Invalid role option. Skipping Role filter.");
-                return users;
-        }
+		final String role;
+		switch (roleChoice) {
+			case 1:
+				role = "normal";
+				break;
+			case 2:
+				role = "admin";
+				break;
+			default:
+				System.out.println("Invalid role option. Skipping Role filter.");
+				return users;
+		}
 
-        return users.stream()
-                .filter(user -> user.getRole().equalsIgnoreCase(role))
-                .collect(Collectors.toList());
-    }
+		return users.stream()
+				.filter(user -> user.getRole().equalsIgnoreCase(role))
+				.collect(Collectors.toList());
+	}
 
 	public List<User> searchUsersByUsername(String usernameSearch, List<User> users) {
 		return users.stream()
@@ -786,15 +789,15 @@ public class TrainTicketSystem {
 				.collect(Collectors.toList());
 	}
 
-	public List<Train> filterTrainsByStation(String departure,String arrival, List<Train> trains) {
+	public List<Train> filterTrainsByStation(String departure, String arrival, List<Train> trains) {
 		return trains.stream()
 				.filter(train -> (departure.isEmpty() || train.getDeparture().toLowerCase().contains(departure)) &&
 						(arrival.isEmpty() || train.getArrival().toLowerCase().contains(arrival)))
 				.collect(Collectors.toList());
 	}
 
-	public List<Train> filterTrainsByDateRange(LocalDate startDateFinal,LocalDate endDateFinal, List<Train> trains) {
-		
+	public List<Train> filterTrainsByDateRange(LocalDate startDateFinal, LocalDate endDateFinal, List<Train> trains) {
+
 		return trains.stream()
 				.filter(train -> {
 					LocalDate trainDate = LocalDate.parse(train.getDate());
@@ -823,7 +826,8 @@ public class TrainTicketSystem {
 				.collect(Collectors.toList());
 	}
 
-	public List<OrderRecord> filterOrdersByDateRange(LocalDate startDateFinal,LocalDate endDateFinal,List<OrderRecord> orders) {
+	public List<OrderRecord> filterOrdersByDateRange(LocalDate startDateFinal, LocalDate endDateFinal,
+			List<OrderRecord> orders) {
 
 		return orders.stream()
 				.filter(order -> {
@@ -836,6 +840,7 @@ public class TrainTicketSystem {
 				})
 				.collect(Collectors.toList());
 	}
+
 	public void listAllUsers() {
 		ArrayList<User> users = userDAO.getUserList();
 		System.out.println("\n--- Registered Users ---");
