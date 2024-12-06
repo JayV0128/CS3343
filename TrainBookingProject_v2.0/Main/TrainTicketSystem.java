@@ -141,7 +141,7 @@ public class TrainTicketSystem {
 		if (currentUser.getCouponList().size() > 0) {
 			double discout = userDAO.useCoupon(result, currentUser);
 			result = result - discout;
-			System.out.println("You use a coupon. Get discount: " + discout);
+			System.out.printf("You use a coupon. Get discount: %.2f\n ", discout);
 		}
 
 		return result;

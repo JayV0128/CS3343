@@ -648,7 +648,7 @@ public class Main {
 				System.out.println("\nTrain Number: " + train.getTrainNumber());
 				System.out.println("Journey: " + "from " + train.getDeparture() + " to " + train.getArrival());
 				System.out.println("Date: " + train.getDate() + ", " + train.getTime());
-				System.out.println("Price: " + train.getPrice());
+				System.out.printf("Price: %.2f\n ", finishedOrders.get(i).getAmount());
 
 				System.out.print("\nPlease rate this order: (1-5, 5 is the best): ");
 				int rating = scanner.nextInt();
