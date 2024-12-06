@@ -746,10 +746,10 @@ public class TrainTicketSystem {
 		ArrayList<CsQuestion> questionList = customerServiceDAO.getTable_question();
 		Set<String> keywordSet = new HashSet<>();
 
-		if (keywords == null || keywords.trim().isEmpty()) {
+		if (keywords.trim().isEmpty()) {
 			return "Keywords cannot be empty.";
 		}
-		if (answer == null || answer.trim().isEmpty()) {
+		if (answer.trim().isEmpty()) {
 			return "Answer cannot be empty.";
 		}
 		String[] keywordArray = keywords.split(",");
