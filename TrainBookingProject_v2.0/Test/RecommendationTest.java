@@ -21,7 +21,7 @@ public class RecommendationTest {
 	
 	@BeforeEach
 	public void setup() {
-		database.resetDB();
+		Database.getInstance().resetDB();
 	}
 	
 	@Test
@@ -49,6 +49,21 @@ public class RecommendationTest {
 	@Test
 	public void testRecommendTrains_3() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+
+		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 0, 100));
+		
+		OrderRecord or = new OrderRecord("orderID_userID_2_0", "userID_2", "trainID_1", new Date(), 1, new ArrayList<Ticket>());
+		or.setRating(-1);
+		
+		database.getTable_orderRecord().add(or);
+		
+		ArrayList<String> result = tts.recommendTrains("userID_2", "None");
+		assertTrue(result.isEmpty());
+	}
+	
+	@Test
+	public void testRecommendTrains_4() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
 		
 		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 24, 100));
 		database.getTable_train().add(new Train("trainID_2", "Washington DC", "Miami", "2024-10-02", "14:00", 24, 150));
@@ -72,7 +87,7 @@ public class RecommendationTest {
 	}	
 	
 	@Test
-	public void testRecommendTrains_4() {
+	public void testRecommendTrains_5() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
 		
 		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 24, 100));
@@ -101,7 +116,7 @@ public class RecommendationTest {
 	}	
 	
 	@Test
-	public void testRecommendTrains_5() {
+	public void testRecommendTrains_6() {
 		TrainTicketSystem tts = TrainTicketSystem.getInstance();
 		
 		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 24, 100));
@@ -120,8 +135,24 @@ public class RecommendationTest {
 		assertEquals("[trainID_1]", result.toString());
 	}
 	
-//	@AfterEach
-//    	public void tearDown() throws Exception{
-//		database.resetDB();
-//    	} 
+	@Test
+	public void testRecommendTrains_7() {
+		TrainTicketSystem tts = TrainTicketSystem.getInstance();
+		
+		database.getTable_train().add(new Train("trainID_1", "LA", "Chicago", "2024-10-01", "12:00", 24, 100));
+		database.getTable_train().add(new Train("trainID_2", "Washington DC", "Miami", "2024-10-02", "14:00", 24, 150));
+		
+		OrderRecord or1 = new OrderRecord("orderID_userID_2_0", "userID_2", "trainID_1", new Date(), 1, new ArrayList<Ticket>());
+		or1.setRating(1);
+		
+		OrderRecord or2 = new OrderRecord("orderID_userID_2_1", "userID_2", "trainID_2", new Date(), 1, new ArrayList<Ticket>());
+		or2.setRating(2);
+		
+		database.getTable_orderRecord().add(or1);
+		database.getTable_orderRecord().add(or2);
+		
+		ArrayList<String> result = tts.recommendTrains("userID_2", "Chicago");
+		assertEquals("[trainID_1]", result.toString());
+	}
+	
 }
