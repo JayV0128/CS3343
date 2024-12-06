@@ -177,32 +177,23 @@ public class TrainTicketSystem {
 	public ArrayList<String> recommendTrains(String id, String location) {
 		ArrayList<OrderRecord> orderRecordList = orderRecordDAO.getOrdersByUserId(id);
 		ArrayList<OrderRecord> filteredOrderRecordList = new ArrayList<OrderRecord>();
-
+		
 		if (orderRecordList.isEmpty()) {
 			return new ArrayList<>();
 		} else {
 			// Check for available trains
-			for (OrderRecord orderRecord : orderRecordList) {
-				Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
-				if (train.getStatus().equals("active") && train.getAvailableSeats() > 0) {
-					filteredOrderRecordList.add(orderRecord);
-				}
+			filteredOrderRecordList = getAvailableTrain(orderRecordList);
+				
+			if (!location.trim().equalsIgnoreCase("None")) {		    	
+		    	filteredOrderRecordList = getMatchedLocation(location, filteredOrderRecordList);
 			}
-
-			if (!location.equals("None")) {
-				// Filter out orders that do not match the location
-				filteredOrderRecordList.removeIf(orderRecord -> {
-					Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
-					return !(train.getDeparture().equals(location) || train.getArrival().equals(location));
-				});
-			} else {
-				filteredOrderRecordList = orderRecordList;
-			}
-
+				
 			Map<String, Integer> trainRating = new HashMap<>();
 			for (OrderRecord orderRecord : filteredOrderRecordList) {
 				String trainId = orderRecord.getTrainId();
-
+				
+				
+				
 				int rating = orderRecord.getRating();
 				if (rating > 0) {
 					trainRating.put(trainId, rating);
@@ -210,18 +201,44 @@ public class TrainTicketSystem {
 					trainRating.put(trainId, 0);
 				}
 			}
-
+	
 			List<String> sortedTrainIds = trainRating.entrySet().stream()
 					.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 					.map(Map.Entry::getKey)
 					.toList();
-
+	
 			int endIndex = Math.min(3, sortedTrainIds.size());
 			ArrayList<String> recommendedTrainIds = new ArrayList<>(sortedTrainIds.subList(0, endIndex));
 			System.out.println(recommendedTrainIds.toString());
-
+			
 			return recommendedTrainIds;
 		}
+	}
+	
+	public ArrayList<OrderRecord> getMatchedLocation(String location, ArrayList<OrderRecord> filteredOrderRecordList) {
+		ArrayList<OrderRecord> tmpArr = new ArrayList<OrderRecord>();
+		
+		for (OrderRecord orderRecord : filteredOrderRecordList) {
+    		Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+			if (train.getDeparture().equals(location) || train.getArrival().equals(location)) {
+				tmpArr.add(orderRecord);
+			}
+    	}
+		
+		return tmpArr;
+	}
+	
+	public ArrayList<OrderRecord> getAvailableTrain(ArrayList<OrderRecord> orderRecordList) {
+		ArrayList<OrderRecord> tmpArr = new ArrayList<OrderRecord>();
+		
+		for (OrderRecord orderRecord : orderRecordList) {
+            Train train = trainDAO.getTrain_fromTrainTable(orderRecord.getTrainId());
+            if (train.getAvailableSeats() > 0) {
+            	tmpArr.add(orderRecord);
+            }
+        }
+		
+		return tmpArr;
 	}
 
 	// arrange single seat
